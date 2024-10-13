@@ -9,8 +9,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { TokensService } from './tokens.service';
-import { Token, TokenUpdate } from 'src/types';
-import { StatusEnum } from 'src/enum';
+import { Token, TokenUpdate } from '../types';
+import { StatusEnum } from '../enum';
 
 @Controller('tokens')
 export class TokensController {

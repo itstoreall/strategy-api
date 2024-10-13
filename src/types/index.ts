@@ -1,4 +1,4 @@
-import { StatusEnum } from 'src/enum';
+import { StatusEnum } from '../enum';
 
 export type Token = {
   symbol: string;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Token, TokenUpdate } from 'src/types';
-import { StatusEnum } from 'src/enum';
+import { Token, TokenUpdate } from '../types';
+import { StatusEnum } from '../enum';
 
 @Injectable()
 export class TokensService {
