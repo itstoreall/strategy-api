@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { TokensService } from './tokens.service';
@@ -36,7 +36,7 @@ export class TokensController {
     return { data: createdToken };
   }
 
-  @Patch(':symbol')
+  @Put(':symbol')
   update(@Param('symbol') symbol: string, @Body() tokenUpdate: TokenUpdate) {
     const updatedToken = this.tokensService.update(symbol, tokenUpdate);
     return { data: updatedToken };
