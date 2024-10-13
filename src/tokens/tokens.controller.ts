@@ -8,7 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { StatusEnum } from 'src/enum';
+import { StatusEnum } from '../enum';
 
 @Controller('tokens') //?status=INIT
 export class TokensController {
