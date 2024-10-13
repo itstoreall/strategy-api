@@ -1,29 +1,34 @@
-import { Injectable } from '@nestjs/common';
-import { Token, TokenUpdate } from '../types';
-import { StatusEnum } from '../enum';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateTokenDto, StatusEnum } from './dto/create-token.dto';
+import { UpdateTokenDto } from './dto/update-token.dto';
+// import { StatusEnum } from '../enum';
 
 @Injectable()
 export class TokensService {
   private tokens = [
     {
+      tokenId: 1,
       symbol: 'btc',
       name: 'bitcoin',
       price: 63000.11,
       status: StatusEnum.Active,
     },
     {
+      tokenId: 2,
       symbol: 'eth',
       name: 'ethereum',
       price: 2550.22,
       status: StatusEnum.Pending,
     },
     {
+      tokenId: 3,
       symbol: 'sol',
       name: 'solana',
       price: 152.33,
       status: StatusEnum.Init,
     },
     {
+      tokenId: 4,
       symbol: 'near',
       name: 'near',
       price: 4.44,
@@ -33,31 +38,41 @@ export class TokensService {
 
   findAll(status?: StatusEnum) {
     if (status) {
-      return this.tokens.filter((token) => token.status === status);
+      const tokens = this.tokens.filter((token) => token.status === status);
+      if (!tokens.length)
+        throw new NotFoundException(`${status} Tokens Not Found!`);
+      return tokens;
     } else return this.tokens;
   }
 
-  findOne(symbol: string) {
+  findById(id: number) {
+    const token = this.tokens.find((token) => token.tokenId === id);
+    if (!token) throw new NotFoundException('Token Not Found!');
+    return { data: token };
+  }
+
+  findBySymbol(symbol: string) {
     const token = this.tokens.find((token) => token.symbol === symbol);
+    if (!token) throw new NotFoundException('Token Not Found!');
     return { data: token };
   }
 
-  create(token: Token) {
-    this.tokens.push(token);
-    return { data: token };
+  create(createTokenDto: CreateTokenDto) {
+    this.tokens.push(createTokenDto);
+    return { data: createTokenDto };
   }
 
-  update(symbol: string, tokenUpdate: TokenUpdate) {
+  update(symbol: string, updateTokenDto: UpdateTokenDto) {
     this.tokens = this.tokens.map((token) => {
       if (token.symbol === symbol) {
-        return { ...token, ...tokenUpdate };
+        return { ...token, ...updateTokenDto };
       } else return token;
     });
-    return this.findOne(symbol);
+    return this.findBySymbol(symbol);
   }
 
   delete(symbol: string) {
-    const removedToken = this.findOne(symbol);
+    const removedToken = this.findBySymbol(symbol);
     this.tokens = this.tokens.filter((token) => token.symbol !== symbol);
     return removedToken;
   }
