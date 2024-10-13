@@ -8,34 +8,43 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { StatusEnum } from '../enum';
+import { TokensService } from './tokens.service';
+import { Token, TokenUpdate } from 'src/types';
+import { StatusEnum } from 'src/enum';
 
-@Controller('tokens') //?status=INIT
+@Controller('tokens')
 export class TokensController {
-  @Get()
+  constructor(private readonly tokensService: TokensService) {}
+
+  @Get() // /tokens?status=INIT
   findAll(@Query('status') status: StatusEnum) {
     const statusValue = status ? status : StatusEnum.All;
-    return { data: { status: statusValue, tokens: [1, 2, 3] } };
+    const tokens = this.tokensService.findAll(status);
+    return { data: { status: statusValue, tokens } };
   }
 
   @Get(':symbol')
   findOne(@Param('symbol') symbol: string) {
-    return { symbol };
+    console.log('symbol:', symbol);
+    const token = this.tokensService.findOne(symbol);
+    return { data: token };
   }
 
   @Post()
-  create(@Body() token: {}) {
-    return token;
+  create(@Body() token: Token) {
+    const createdToken = this.tokensService.create(token);
+    return { data: createdToken };
   }
 
   @Patch(':symbol')
-  update(@Param('symbol') symbol: string, @Body() tokenUpdate: {}) {
-    console.log('tokenUpdate:', symbol, tokenUpdate);
-    return { ...tokenUpdate };
+  update(@Param('symbol') symbol: string, @Body() tokenUpdate: TokenUpdate) {
+    const updatedToken = this.tokensService.update(symbol, tokenUpdate);
+    return { data: updatedToken };
   }
 
   @Delete(':symbol')
   delete(@Param('symbol') symbol: string) {
-    return { symbol };
+    const deletedToken = this.tokensService.delete(symbol);
+    return { data: deletedToken };
   }
 }
