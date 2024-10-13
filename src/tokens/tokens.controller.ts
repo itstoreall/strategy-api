@@ -15,7 +15,7 @@ export class TokensController {
   @Get()
   findAll(@Query('status') status: StatusEnum) {
     const statusValue = status ? status : StatusEnum.All;
-    return { status: statusValue, data: [1, 2, 3] };
+    return { data: { status: statusValue, tokens: [1, 2, 3] } };
   }
 
   @Get(':symbol')
