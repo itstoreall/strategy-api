@@ -6,7 +6,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  init(): string {
+  getRoot(): string {
     return this.appService.init();
   }
 }
