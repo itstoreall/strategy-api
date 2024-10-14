@@ -9,7 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 const throttlerShort = {
   name: 'short',
   ttl: 1000,
-  limit: 1,
+  limit: 5,
 };
 
 const throttleLong = {
