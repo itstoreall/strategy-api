@@ -15,9 +15,9 @@ enum Status {
 }
 
 model Token {
-  id        Int     @id @default(autoincrement())
-  symbol    String  @unique
-  name      String  @unique
+  id        Int      @id @default(autoincrement())
+  symbol    String   @unique
+  name      String   @unique
   price     Float
   status    Status
   createdAt DateTime @default(now())
