@@ -1,3 +1,45 @@
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { DatabaseService } from 'src/database/database.service';
+import { StatusEnum } from './dto/create-token.dto';
+
+@Injectable()
+export class TokensService {
+  constructor(private readonly databaseService: DatabaseService) {}
+
+  async findAll(status?: StatusEnum) {
+    if (status) {
+      return this.databaseService.token.findMany({ where: { status } });
+    } else return this.databaseService.token.findMany();
+  }
+
+  async findById(id: number) {
+    return this.databaseService.token.findUnique({ where: { id } });
+  }
+
+  async findBySymbol(symbol: string) {
+    return this.databaseService.token.findUnique({ where: { symbol } });
+  }
+
+  async create(createTokenDto: Prisma.TokenCreateInput) {
+    return await this.databaseService.token.create({
+      data: createTokenDto,
+    });
+  }
+
+  async update(symbol: string, updateTokenDto: Prisma.TokenUpdateInput) {
+    return await this.databaseService.token.update({
+      where: { symbol },
+      data: updateTokenDto,
+    });
+  }
+
+  async delete(symbol: string) {
+    return this.databaseService.token.delete({ where: { symbol } });
+  }
+}
+
+/* before adding Prisma --
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTokenDto, StatusEnum } from './dto/create-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
@@ -77,3 +119,4 @@ export class TokensService {
     return removedToken;
   }
 }
+*/

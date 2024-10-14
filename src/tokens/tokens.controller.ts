@@ -8,6 +8,70 @@ import {
   Post,
   Put,
   Query,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { StatusEnum } from './dto/create-token.dto';
+import { TokensService } from './tokens.service';
+
+@Controller('tokens')
+export class TokensController {
+  constructor(private readonly tokensService: TokensService) {}
+
+  @Get() // /tokens?status=INIT
+  async findAll(@Query('status') status?: StatusEnum) {
+    const statusValue = status ? status : StatusEnum.All;
+    const tokens = await this.tokensService.findAll(status);
+    return { data: { status: statusValue, tokens } };
+  }
+
+  @Get('id/:id')
+  async findById(@Param('id', ParseIntPipe) id: number) {
+    const token = await this.tokensService.findById(id);
+    return { data: token };
+  }
+
+  @Get(':symbol')
+  async findOne(@Param('symbol') symbol: string) {
+    const token = await this.tokensService.findBySymbol(symbol);
+    return { data: token };
+  }
+
+  @Post()
+  async create(@Body() createTokenDto: Prisma.TokenCreateInput) {
+    const createdToken = await this.tokensService.create(createTokenDto);
+    return { data: createdToken };
+  }
+
+  @Put(':symbol')
+  async update(
+    @Param('symbol') symbol: string,
+    @Body() updateTokenDto: Prisma.TokenUpdateInput,
+  ) {
+    const updatedToken = await this.tokensService.update(
+      symbol,
+      updateTokenDto,
+    );
+    return { data: updatedToken };
+  }
+
+  @Delete(':symbol')
+  async delete(@Param('symbol') symbol: string) {
+    const deletedToken = await this.tokensService.delete(symbol);
+    return { data: deletedToken };
+  }
+}
+
+/* before adding Prisma --
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
   ValidationPipe,
 } from '@nestjs/common';
 import { TokensService } from './tokens.service';
@@ -58,3 +122,4 @@ export class TokensController {
     return { data: deletedToken };
   }
 }
+*/
