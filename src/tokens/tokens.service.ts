@@ -37,10 +37,7 @@ export class TokensService {
       this.findAll(),
     ]);
 
-    console.log('prices --->', prices);
-    console.log('currentTokens --->', currentTokens);
-
-    /*
+    // /*
     if (prices && currentTokens) {
       for (const token of currentTokens) {
         const newPrice = +prices[token.pair];
@@ -53,7 +50,7 @@ export class TokensService {
         }
       }
     }
-    */
+    // */
 
     return await this.findAll();
   }
