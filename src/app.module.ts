@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { TokensModule } from './tokens/tokens.module';
 import { DatabaseModule } from './database/database.module';
 import { BinanceService } from './binance/binance.service';
@@ -27,6 +29,9 @@ const ThrottlerProvider = {
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     TokensModule,
     DatabaseModule,
     ThrottlerModule.forRoot([throttlerShort, throttleLong]),
