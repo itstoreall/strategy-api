@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import { BinanceService } from '../binance/binance.service';
 import { StatusEnum } from './dto/create-token.dto';
 
 @Injectable()
 export class TokensService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly binanceServise: BinanceService,
+  ) {}
 
   async findAll(status?: StatusEnum) {
     if (status) {
@@ -27,7 +31,29 @@ export class TokensService {
     });
   }
 
-  async update(symbol: string, updateTokenDto: Prisma.TokenUpdateInput) {
+  async updatePrices() {
+    const [prices, currentTokens] = await Promise.all([
+      this.binanceServise.getTokenPriceByPair(),
+      this.findAll(),
+    ]);
+
+    if (prices && currentTokens) {
+      for (const token of currentTokens) {
+        const newPrice = +prices[token.pair];
+
+        if (newPrice) {
+          await this.databaseService.token.update({
+            where: { symbol: token.symbol },
+            data: { price: newPrice },
+          });
+        }
+      }
+    }
+
+    return await this.findAll();
+  }
+
+  async updateToken(symbol: string, updateTokenDto: Prisma.TokenUpdateInput) {
     return await this.databaseService.token.update({
       where: { symbol },
       data: updateTokenDto,

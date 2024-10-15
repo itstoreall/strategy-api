@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,7 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { StatusEnum } from './dto/create-token.dto';
+import { CreateTokenDto, StatusEnum } from './dto/create-token.dto';
 import { TokensService } from './tokens.service';
 import { LoggerService } from '../logger/logger.service';
 
@@ -41,9 +42,18 @@ export class TokensController {
   }
 
   @Post()
-  async create(@Body() createTokenDto: Prisma.TokenCreateInput) {
+  async create(@Body() createTokenDto: CreateTokenDto) {
+    const pairRegex = /^[A-Z]+USDT$/;
+    if (!pairRegex.test(createTokenDto.pair))
+      throw new BadRequestException('Invalid pair format!');
     const createdToken = await this.tokensService.create(createTokenDto);
     return { data: createdToken };
+  }
+
+  @Put('update')
+  async updatePrices() {
+    const updatedTokens = await this.tokensService.updatePrices();
+    return { data: updatedTokens };
   }
 
   @Put(':symbol')
@@ -51,7 +61,7 @@ export class TokensController {
     @Param('symbol') symbol: string,
     @Body() updateTokenDto: Prisma.TokenUpdateInput,
   ) {
-    const updatedToken = await this.tokensService.update(
+    const updatedToken = await this.tokensService.updateToken(
       symbol,
       updateTokenDto,
     );

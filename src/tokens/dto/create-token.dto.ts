@@ -24,6 +24,10 @@ export class CreateTokenDto {
   @IsNotEmpty()
   price: number;
 
+  @IsString({ message: 'valid pair required!' })
+  @IsNotEmpty()
+  pair: string;
+
   @IsEnum(StatusEnum, { message: 'valid status required!' })
   @IsNotEmpty()
   status: StatusEnum;

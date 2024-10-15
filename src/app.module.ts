@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { TokensModule } from './tokens/tokens.module';
 import { DatabaseModule } from './database/database.module';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { BinanceService } from './binance/binance.service';
 import { LoggerModule } from './logger/logger.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 const throttlerShort = {
   name: 'short',
@@ -32,6 +33,6 @@ const ThrottlerProvider = {
     LoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ThrottlerProvider],
+  providers: [AppService, ThrottlerProvider, BinanceService],
 })
 export class AppModule {}
