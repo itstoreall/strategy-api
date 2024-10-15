@@ -32,12 +32,15 @@ export class TokensService {
   }
 
   async updatePrices() {
-    /*
     const [prices, currentTokens] = await Promise.all([
       this.binanceServise.getTokenPriceByPair(),
       this.findAll(),
     ]);
 
+    console.log('prices --->', prices);
+    console.log('currentTokens --->', currentTokens);
+
+    /*
     if (prices && currentTokens) {
       for (const token of currentTokens) {
         const newPrice = +prices[token.pair];
