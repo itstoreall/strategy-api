@@ -32,6 +32,7 @@ export class TokensService {
   }
 
   async updatePrices() {
+    /*
     const [prices, currentTokens] = await Promise.all([
       this.binanceServise.getTokenPriceByPair(),
       this.findAll(),
@@ -49,6 +50,7 @@ export class TokensService {
         }
       }
     }
+    */
 
     return await this.findAll();
   }
