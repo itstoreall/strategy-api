@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Ip,
   Param,
   ParseIntPipe,
   Post,
@@ -12,13 +13,16 @@ import {
 import { Prisma } from '@prisma/client';
 import { StatusEnum } from './dto/create-token.dto';
 import { TokensService } from './tokens.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Controller('tokens')
 export class TokensController {
   constructor(private readonly tokensService: TokensService) {}
+  private readonly logger = new LoggerService(TokensController.name);
 
   @Get() // /tokens?status=INIT
-  async findAll(@Query('status') status?: StatusEnum) {
+  async findAll(@Ip() ip: string, @Query('status') status?: StatusEnum) {
+    this.logger.log(`Request for ALL Tokens\t${ip}`, TokensController.name);
     const statusValue = status ? status : StatusEnum.All;
     const tokens = await this.tokensService.findAll(status);
     return { data: { status: statusValue, tokens } };

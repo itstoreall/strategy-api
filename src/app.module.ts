@@ -5,6 +5,7 @@ import { TokensModule } from './tokens/tokens.module';
 import { DatabaseModule } from './database/database.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { LoggerModule } from './logger/logger.module';
 
 const throttlerShort = {
   name: 'short',
@@ -28,6 +29,7 @@ const ThrottlerProvider = {
     TokensModule,
     DatabaseModule,
     ThrottlerModule.forRoot([throttlerShort, throttleLong]),
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService, ThrottlerProvider],
