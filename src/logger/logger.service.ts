@@ -1,10 +1,14 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
+
+/*
 import * as fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import * as path from 'path';
+*/
 
 @Injectable()
 export class LoggerService extends ConsoleLogger {
+  /*
   async logToFile(entry) {
     const formattedEntry = `${Intl.DateTimeFormat('en-US', {
       dateStyle: 'short',
@@ -24,16 +28,21 @@ export class LoggerService extends ConsoleLogger {
       if (e instanceof Error) console.error(e.message);
     }
   }
+  */
 
   log(message: string | object, context?: string) {
+    /*
     const entry = `${context}\t${message}`;
     this.logToFile(entry);
+    */
     super.log(message, context);
   }
 
   error(message: string | object, stackOrContext?: string) {
+    /*
     const entry = `${stackOrContext}\t${message}`;
     this.logToFile(entry);
+    */
     super.error(message, stackOrContext);
   }
 }
