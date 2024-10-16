@@ -7,7 +7,7 @@ export enum StatusEnum {
   Pending = 'PENDING',
 }
 
-export class CreateTokenDto {
+export class TokenDto {
   @IsInt({ message: 'valid tokenId required!' })
   @IsNotEmpty()
   tokenId: number;

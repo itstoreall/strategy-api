@@ -29,13 +29,11 @@ const ThrottlerProvider = {
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
-    }),
     TokensModule,
     DatabaseModule,
-    ThrottlerModule.forRoot([throttlerShort, throttleLong]),
     LoggerModule,
+    ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),
+    ThrottlerModule.forRoot([throttlerShort, throttleLong]),
   ],
   controllers: [AppController],
   providers: [AppService, ThrottlerProvider, BinanceService],

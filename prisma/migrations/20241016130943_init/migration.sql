@@ -3,16 +3,23 @@ CREATE TYPE "Status" AS ENUM ('ALL', 'INIT', 'ACTIVE', 'PENDING');
 
 -- CreateTable
 CREATE TABLE "Token" (
-    "tokenId" SERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "symbol" TEXT NOT NULL,
-    "name" TEXT,
+    "name" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
+    "pair" TEXT NOT NULL,
     "status" "Status" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Token_pkey" PRIMARY KEY ("tokenId")
+    CONSTRAINT "Token_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Token_symbol_key" ON "Token"("symbol");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Token_name_key" ON "Token"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Token_pair_key" ON "Token"("pair");

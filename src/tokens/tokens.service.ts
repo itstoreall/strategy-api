@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { BinanceService } from '../binance/binance.service';
-import { StatusEnum } from './dto/create-token.dto';
+import { StatusEnum, TokenDto } from './dto/create-token.dto';
 
 @Injectable()
 export class TokensService {
@@ -25,10 +25,34 @@ export class TokensService {
     return this.databaseService.token.findUnique({ where: { symbol } });
   }
 
-  async create(createTokenDto: Prisma.TokenCreateInput) {
-    return await this.databaseService.token.create({
-      data: createTokenDto,
-    });
+  async create(createInput: Prisma.TokenCreateInput) {
+    const createdPair = `${createInput.symbol.toUpperCase()}USDT`;
+    const pairRegex = /^[A-Z]+USDT$/;
+    if (!pairRegex.test(createdPair))
+      throw new BadRequestException('Invalid pair format!');
+
+    const checkParam = { where: { symbol: createInput.symbol } };
+    const isExists = await this.databaseService.token.findUnique(checkParam);
+    if (isExists) throw new BadRequestException('Token already exists!');
+
+    let currentPrice: TokenDto['price'];
+
+    try {
+      const price = await this.binanceServise.getTokenPriceByPair(createdPair);
+      currentPrice = +price[createdPair];
+
+      const tokenDto: Prisma.TokenCreateInput = {
+        symbol: createInput.symbol,
+        name: createInput.name,
+        price: currentPrice,
+        pair: createdPair,
+        status: StatusEnum.Init,
+      };
+
+      return await this.databaseService.token.create({ data: tokenDto });
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   async updatePrices() {
@@ -37,7 +61,6 @@ export class TokensService {
       this.findAll(),
     ]);
 
-    // /*
     if (prices && currentTokens) {
       for (const token of currentTokens) {
         const newPrice = +prices[token.pair];
@@ -50,7 +73,6 @@ export class TokensService {
         }
       }
     }
-    // */
 
     return await this.findAll();
   }
