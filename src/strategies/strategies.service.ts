@@ -3,14 +3,18 @@ import { Prisma } from '@prisma/client';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
 import { StrategyTypeEnum } from '../enum';
 import { DatabaseService } from '../database/database.service';
+import { UpdateStrategyDto } from './dto/update-strategy.dto';
 // import { UpdateStrategyDto } from './dto/update-strategy.dto';
 
 @Injectable()
 export class StrategiesService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly db: DatabaseService) {}
 
   async findAll(strategyType?: StrategyTypeEnum, extend?: boolean) {
-    if (!strategyType) return await this.databaseService.strategy.findMany();
+    if (!strategyType)
+      return await this.db.strategy.findMany({
+        orderBy: { updatedAt: 'desc' },
+      });
 
     const tokenFields = {
       id: extend ? true : false,
@@ -33,20 +37,15 @@ export class StrategiesService {
       select: {
         ...tokenFields,
         orders: {
-          select: {
-            ...orderFields,
-          },
+          select: { ...orderFields },
+          orderBy: { updatedAt: 'desc' },
         },
       },
     };
 
-    const shortToken = {
-      select: {
-        symbol: true,
-      },
-    };
+    const shortToken = { select: { symbol: true } };
 
-    const strategies = await this.databaseService.strategy.findMany({
+    const strategies = await this.db.strategy.findMany({
       where: { type: strategyType },
       select: {
         type: true,
@@ -54,7 +53,7 @@ export class StrategiesService {
       },
     });
 
-    const result = strategies.reduce((acc, strategy) => {
+    const res = strategies.reduce((acc, strategy) => {
       const existingStrategy = acc.find((s) => s.type === strategy.type);
       const tokenParam = extend ? strategy.token : strategy.token.symbol;
 
@@ -67,7 +66,7 @@ export class StrategiesService {
       return acc;
     }, []);
 
-    return result;
+    return res;
   }
 
   /* JSON Content:
@@ -78,10 +77,8 @@ export class StrategiesService {
   }
   */
   async create(createStrategyDto: CreateStrategyDto) {
-    console.log('createStrategyDto:', createStrategyDto);
-
     const checkParam = { where: { symbol: createStrategyDto.symbol } };
-    const token = await this.databaseService.token.findUnique(checkParam);
+    const token = await this.db.token.findUnique(checkParam);
     if (!token) throw new BadReq('Token not found!');
 
     const { type, symbol, status } = createStrategyDto;
@@ -92,20 +89,25 @@ export class StrategiesService {
       token: { connect: { symbol } },
     };
 
-    return await this.databaseService.strategy.create({ data: newStrategy });
+    return await this.db.strategy.create({ data: newStrategy });
+  }
+
+  async findById(id: number) {
+    return await this.db.strategy.findUnique({ where: { id } });
+  }
+
+  async updateStrategyById(id: number, updateStrategyDto: UpdateStrategyDto) {
+    return await this.db.strategy.update({
+      where: { id },
+      data: updateStrategyDto as Prisma.StrategyUpdateInput,
+    });
+  }
+
+  async deleteById(id: number) {
+    return await this.db.strategy.delete({ where: { id } });
   }
 
   /*
-  findOne(id: number) {
-    return `This action returns a #${id} strategy`;
-  }
 
-  update(id: number, updateStrategyDto: UpdateStrategyDto) {
-    return `This action updates a #${id} strategy`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} strategy`;
-  }
   */
 }

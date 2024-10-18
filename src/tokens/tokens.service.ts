@@ -1,70 +1,56 @@
 import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateTokenDto } from './dto/create-token.dto';
+import { UpdateTokenDto } from './dto/update-token.dto';
 import { TokenStatusEnum } from '../enum';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from '../database/database.service';
 import { BinanceService } from '../binance/binance.service';
 
 @Injectable()
 export class TokensService {
   constructor(
-    private readonly databaseService: DatabaseService,
-    private readonly binanceServise: BinanceService,
+    private readonly db: DatabaseService,
+    private readonly binance: BinanceService,
   ) {}
 
   async findAll(status?: TokenStatusEnum, orderSymbol?: string) {
-    const ordersParam = { some: { symbol: orderSymbol } };
-    const statusOrderWhere = { status, orders: ordersParam };
-    const orderWhere = { orders: ordersParam };
-    const statusWhere = { status };
+    const statusValue = status ? status : TokenStatusEnum.All;
 
+    const ordersParam = { some: { symbol: orderSymbol } };
     const param = {
       where:
-        status && orderSymbol
-          ? statusOrderWhere
+        statusValue && orderSymbol
+          ? { status: statusValue, orders: ordersParam }
           : orderSymbol
-            ? orderWhere
+            ? { orders: ordersParam }
             : status
-              ? statusWhere
+              ? { status: statusValue }
               : {},
     };
 
-    return this.databaseService.token.findMany(param);
+    const res = await this.db.token.findMany(param);
+    return { status: statusValue, tokens: res };
   }
-
-  /*
-  async findAll(status?: TokenStatusEnum) {
-    if (status) {
-      return this.databaseService.token.findMany({ where: { status } });
-    } else return this.databaseService.token.findMany();
-  }
-  // */
 
   async findById(id: number) {
-    return this.databaseService.token.findUnique({ where: { id } });
+    return await this.db.token.findUnique({ where: { id } });
   }
 
   async findBySymbol(symbol: string) {
-    return this.databaseService.token.findUnique({ where: { symbol } });
+    return await this.db.token.findUnique({ where: { symbol } });
   }
 
-  /* JSON Content:
-  {
-    "symbol": "btc",
-    "name": "bitcoin"
-  }
-  */
   async create(createTokenDto: CreateTokenDto) {
     const createdPair = `${createTokenDto.symbol.toUpperCase()}USDT`;
     const pairRegex = /^[A-Z]+USDT$/;
     if (!pairRegex.test(createdPair)) throw new BadReq('Invalid pair format!');
 
     const checkParam = { where: { symbol: createTokenDto.symbol } };
-    const token = await this.databaseService.token.findUnique(checkParam);
+    const token = await this.db.token.findUnique(checkParam);
     if (token) throw new BadReq('Token already exists!');
 
     try {
-      const price = await this.binanceServise.getTokenPriceByPair(createdPair);
+      const price = await this.binance.getTokenPriceByPair(createdPair);
       const { symbol, name } = createTokenDto;
 
       const newToken: Prisma.TokenCreateInput = {
@@ -75,7 +61,7 @@ export class TokensService {
         status: TokenStatusEnum.Init,
       };
 
-      return await this.databaseService.token.create({ data: newToken });
+      return await this.db.token.create({ data: newToken });
     } catch (err) {
       throw new BadReq(err.message);
     }
@@ -83,16 +69,16 @@ export class TokensService {
 
   async updatePrices() {
     const [prices, currentTokens] = await Promise.all([
-      this.binanceServise.getTokenPriceByPair(),
+      this.binance.getTokenPriceByPair(),
       this.findAll(),
     ]);
 
     if (prices && currentTokens) {
-      for (const token of currentTokens) {
+      for (const token of currentTokens.tokens) {
         const newPrice = +prices[token.pair];
 
         if (newPrice) {
-          await this.databaseService.token.update({
+          await this.db.token.update({
             where: { symbol: token.symbol },
             data: { price: newPrice },
           });
@@ -103,15 +89,15 @@ export class TokensService {
     return await this.findAll();
   }
 
-  async updateToken(symbol: string, updateTokenDto: Prisma.TokenUpdateInput) {
-    return await this.databaseService.token.update({
+  async updateTokenBySymbol(symbol: string, updateTokenDto: UpdateTokenDto) {
+    return await this.db.token.update({
       where: { symbol },
-      data: updateTokenDto,
+      data: updateTokenDto as Prisma.TokenUpdateInput,
     });
   }
 
-  async delete(symbol: string) {
-    return this.databaseService.token.delete({ where: { symbol } });
+  async deleteBySymbol(symbol: string) {
+    return await this.db.token.delete({ where: { symbol } });
   }
 }
 

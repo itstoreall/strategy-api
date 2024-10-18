@@ -1,4 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateStrategyDto } from './create-strategy.dto';
+import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { StrategyStatusEnum } from '../../enum';
 
-export class UpdateStrategyDto extends PartialType(CreateStrategyDto) {}
+export class UpdateStrategyDto {
+  @IsEnum(StrategyStatusEnum, { message: 'valid status required!' })
+  @IsOptional()
+  @IsNotEmpty()
+  status?: StrategyStatusEnum;
+}

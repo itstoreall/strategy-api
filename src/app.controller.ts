@@ -7,11 +7,13 @@ export class AppController {
 
   @Get('/')
   init(): string {
-    return this.appService.init();
+    const init = this.appService.init();
+    return `${init} /`;
   }
 
   @Get('/api')
   api(): string {
-    return this.appService.init();
+    const init = this.appService.init();
+    return `${init} /api`;
   }
 }

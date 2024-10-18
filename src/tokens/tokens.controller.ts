@@ -1,78 +1,79 @@
 import {
+  Ip,
+  Get,
+  Put,
+  Post,
+  Delete,
+  Param,
+  Query,
   Body,
   Controller,
-  Delete,
-  Get,
-  Ip,
-  Param,
   ParseIntPipe,
-  Post,
-  Put,
-  Query,
+  UseInterceptors,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateTokenDto } from './dto/create-token.dto';
+import { UpdateTokenDto } from './dto/update-token.dto';
 import { TokenStatusEnum } from '../enum';
 import { TokensService } from './tokens.service';
 import { LoggerService } from '../logger/logger.service';
 
 @Controller('tokens')
+@UseInterceptors(ResponseInterceptor)
 export class TokensController {
   constructor(private readonly tokensService: TokensService) {}
   private readonly logger = new LoggerService(TokensController.name);
 
-  @Get() // /tokens?status=INIT
-  async findAll(
+  /* /tokens?status=INIT&order_symbol=btc */
+
+  @Get()
+  findAll(
     @Ip() ip: string,
     @Query('status') status?: TokenStatusEnum,
-    @Query('order') orderSymbol?: string,
+    @Query('order_symbol') orderSymbol?: string,
   ) {
-    this.logger.log(`Request for ALL Tokens\t${ip}`, TokensController.name);
-    const statusValue = status ? status : TokenStatusEnum.All;
-    const tokens = await this.tokensService.findAll(status, orderSymbol);
-    return { data: { status: statusValue, tokens } };
+    this.logger.log(`Req for ALL Tokens\t${ip}`, TokensController.name);
+    return this.tokensService.findAll(status, orderSymbol);
   }
 
   @Get('id/:id')
-  async findById(@Param('id', ParseIntPipe) id: number) {
-    const token = await this.tokensService.findById(id);
-    return { data: token };
+  findById(@Param('id', ParseIntPipe) id: number) {
+    return this.tokensService.findById(id);
   }
 
   @Get(':symbol')
-  async findOne(@Param('symbol') symbol: string) {
-    const token = await this.tokensService.findBySymbol(symbol);
-    return { data: token };
+  findBySymbol(@Param('symbol') symbol: string) {
+    return this.tokensService.findBySymbol(symbol);
   }
 
+  /* JSON Content:
+  {
+    "symbol": "btc",
+    "name": "bitcoin"
+  } 
+  */
+
   @Post()
-  async create(@Body() createTokenDto: CreateTokenDto) {
-    const createdToken = await this.tokensService.create(createTokenDto);
-    return { data: createdToken };
+  create(@Body() createTokenDto: CreateTokenDto) {
+    return this.tokensService.create(createTokenDto);
   }
 
   @Put('update-prices')
-  async updatePrices() {
-    const updatedTokens = await this.tokensService.updatePrices();
-    return { data: updatedTokens };
+  updatePrices() {
+    return this.tokensService.updatePrices();
   }
 
   @Put(':symbol')
-  async update(
+  updateBySymbol(
     @Param('symbol') symbol: string,
-    @Body() updateTokenDto: Prisma.TokenUpdateInput,
+    @Body() updateTokenDto: UpdateTokenDto,
   ) {
-    const updatedToken = await this.tokensService.updateToken(
-      symbol,
-      updateTokenDto,
-    );
-    return { data: updatedToken };
+    return this.tokensService.updateTokenBySymbol(symbol, updateTokenDto);
   }
 
   @Delete(':symbol')
-  async delete(@Param('symbol') symbol: string) {
-    const deletedToken = await this.tokensService.delete(symbol);
-    return { data: deletedToken };
+  deleteBySymbol(@Param('symbol') symbol: string) {
+    return this.tokensService.deleteBySymbol(symbol);
   }
 }
 

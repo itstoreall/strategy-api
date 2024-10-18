@@ -1,9 +1,11 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ExceptionsFilter } from './exceptions.filter';
 import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
+  const port = process.env.PORT || 3001;
+
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
@@ -12,6 +14,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.setGlobalPrefix('api', { exclude: ['/', '/api'] });
-  await app.listen(4466);
+
+  await app.listen(port);
 }
 bootstrap();

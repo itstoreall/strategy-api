@@ -1,15 +1,28 @@
-import { Body, Controller, Get, Ip, Post, Query } from '@nestjs/common';
+import {
+  Ip,
+  Get,
+  Put,
+  Post,
+  Delete,
+  Param,
+  Query,
+  Body,
+  Controller,
+  ParseIntPipe,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
+import { UpdateStrategyDto } from './dto/update-strategy.dto';
 import { StrategyTypeEnum } from '../enum';
-import { TokensController } from '../tokens/tokens.controller';
 import { StrategiesService } from './strategies.service';
 import { LoggerService } from '../logger/logger.service';
-// import { UpdateStrategyDto } from './dto/update-strategy.dto';
 
 @Controller('strategies')
+@UseInterceptors(ResponseInterceptor)
 export class StrategiesController {
   constructor(private readonly strategiesService: StrategiesService) {}
-  private readonly logger = new LoggerService(TokensController.name);
+  private readonly logger = new LoggerService(StrategiesController.name);
 
   @Get()
   findAll(
@@ -17,7 +30,7 @@ export class StrategiesController {
     @Query('type') strategyType?: StrategyTypeEnum,
     @Query('extend') extend?: boolean,
   ) {
-    this.logger.log(`Request for ALL Strategies\t${ip}`, TokensController.name);
+    this.logger.log(`Req for ALL Strategies\t${ip}`, StrategiesController.name);
     return this.strategiesService.findAll(strategyType, extend);
   }
 
@@ -26,23 +39,21 @@ export class StrategiesController {
     return this.strategiesService.create(createStrategyDto);
   }
 
-  /*
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.strategiesService.findOne(+id);
+  @Get('id/:id')
+  findById(@Param('id', ParseIntPipe) id: string) {
+    return this.strategiesService.findById(+id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
+  @Put('id/:id')
+  updateById(
+    @Param('id', ParseIntPipe) id: string,
     @Body() updateStrategyDto: UpdateStrategyDto,
   ) {
-    return this.strategiesService.update(+id, updateStrategyDto);
+    return this.strategiesService.updateStrategyById(+id, updateStrategyDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.strategiesService.remove(+id);
+  @Delete('id/:id')
+  deleteById(@Param('id') id: string) {
+    return this.strategiesService.deleteById(+id);
   }
-  */
 }

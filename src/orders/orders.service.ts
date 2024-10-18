@@ -3,28 +3,22 @@ import { Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatusEnum, OrderTypeEnum } from '../enum';
 import { DatabaseService } from '../database/database.service';
-// import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly db: DatabaseService) {}
 
-  findAll() {
-    return this.databaseService.order.findMany();
+  async findAll() {
+    return await this.db.order.findMany({
+      orderBy: { updatedAt: 'desc' },
+    });
   }
 
-  /* JSON Content:
-  { 
-    "type": "BUY", 
-    "symbol": "sol", 
-    "price": 162.98, 
-    "amount": 1.6 
-  }
-  */
   async create(createOrderDto: CreateOrderDto) {
     try {
       const checkParam = { where: { symbol: createOrderDto.symbol } };
-      const token = await this.databaseService.token.findUnique(checkParam);
+      const token = await this.db.token.findUnique(checkParam);
       if (!token) throw new BadReq('Token not found!');
 
       const { amount, price } = createOrderDto;
@@ -39,28 +33,24 @@ export class OrdersService {
         token: { connect: { symbol: token.symbol } },
       };
 
-      return await this.databaseService.order.create({ data: newOrder });
+      return await this.db.order.create({ data: newOrder });
     } catch (err) {
       throw new BadReq(err.message);
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findById(id: number) {
+    return await this.db.order.findUnique({ where: { id } });
   }
 
-  /*
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
-  }
-  
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async updateOrderById(id: number, updateTokenDto: UpdateOrderDto) {
+    return await this.db.order.update({
+      where: { id },
+      data: updateTokenDto as Prisma.OrderUpdateInput,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async removeById(id: number) {
+    return await this.db.order.delete({ where: { id } });
   }
-  */
 }
