@@ -9,6 +9,8 @@ import { BinanceService } from './binance/binance.service';
 import { LoggerModule } from './logger/logger.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { OrdersModule } from './orders/orders.module';
+import { StrategiesModule } from './strategies/strategies.module';
 
 const throttlerShort = {
   name: 'short',
@@ -30,6 +32,8 @@ const ThrottlerProvider = {
 @Module({
   imports: [
     TokensModule,
+    OrdersModule,
+    StrategiesModule,
     DatabaseModule,
     LoggerModule,
     ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),

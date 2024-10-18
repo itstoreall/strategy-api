@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CreateTokenDto } from './dto/create-token.dto';
+import { TokenStatusEnum } from '../enum';
 import { DatabaseService } from 'src/database/database.service';
 import { BinanceService } from '../binance/binance.service';
-import { StatusEnum, TokenDto } from './dto/create-token.dto';
 
 @Injectable()
 export class TokensService {
@@ -11,11 +12,33 @@ export class TokensService {
     private readonly binanceServise: BinanceService,
   ) {}
 
-  async findAll(status?: StatusEnum) {
+  async findAll(status?: TokenStatusEnum, orderSymbol?: string) {
+    const ordersParam = { some: { symbol: orderSymbol } };
+    const statusOrderWhere = { status, orders: ordersParam };
+    const orderWhere = { orders: ordersParam };
+    const statusWhere = { status };
+
+    const param = {
+      where:
+        status && orderSymbol
+          ? statusOrderWhere
+          : orderSymbol
+            ? orderWhere
+            : status
+              ? statusWhere
+              : {},
+    };
+
+    return this.databaseService.token.findMany(param);
+  }
+
+  /*
+  async findAll(status?: TokenStatusEnum) {
     if (status) {
       return this.databaseService.token.findMany({ where: { status } });
     } else return this.databaseService.token.findMany();
   }
+  // */
 
   async findById(id: number) {
     return this.databaseService.token.findUnique({ where: { id } });
@@ -25,33 +48,36 @@ export class TokensService {
     return this.databaseService.token.findUnique({ where: { symbol } });
   }
 
-  async create(createInput: Prisma.TokenCreateInput) {
-    const createdPair = `${createInput.symbol.toUpperCase()}USDT`;
+  /* JSON Content:
+  {
+    "symbol": "btc",
+    "name": "bitcoin"
+  }
+  */
+  async create(createTokenDto: CreateTokenDto) {
+    const createdPair = `${createTokenDto.symbol.toUpperCase()}USDT`;
     const pairRegex = /^[A-Z]+USDT$/;
-    if (!pairRegex.test(createdPair))
-      throw new BadRequestException('Invalid pair format!');
+    if (!pairRegex.test(createdPair)) throw new BadReq('Invalid pair format!');
 
-    const checkParam = { where: { symbol: createInput.symbol } };
-    const isExists = await this.databaseService.token.findUnique(checkParam);
-    if (isExists) throw new BadRequestException('Token already exists!');
-
-    let currentPrice: TokenDto['price'];
+    const checkParam = { where: { symbol: createTokenDto.symbol } };
+    const token = await this.databaseService.token.findUnique(checkParam);
+    if (token) throw new BadReq('Token already exists!');
 
     try {
       const price = await this.binanceServise.getTokenPriceByPair(createdPair);
-      currentPrice = +price[createdPair];
+      const { symbol, name } = createTokenDto;
 
-      const tokenDto: Prisma.TokenCreateInput = {
-        symbol: createInput.symbol,
-        name: createInput.name,
-        price: currentPrice,
+      const newToken: Prisma.TokenCreateInput = {
+        symbol,
+        name,
+        price: +price[createdPair],
         pair: createdPair,
-        status: StatusEnum.Init,
+        status: TokenStatusEnum.Init,
       };
 
-      return await this.databaseService.token.create({ data: tokenDto });
+      return await this.databaseService.token.create({ data: newToken });
     } catch (err) {
-      throw new BadRequestException(err.message);
+      throw new BadReq(err.message);
     }
   }
 

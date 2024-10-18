@@ -11,7 +11,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { StatusEnum } from './dto/create-token.dto';
+import { CreateTokenDto } from './dto/create-token.dto';
+import { TokenStatusEnum } from '../enum';
 import { TokensService } from './tokens.service';
 import { LoggerService } from '../logger/logger.service';
 
@@ -21,10 +22,14 @@ export class TokensController {
   private readonly logger = new LoggerService(TokensController.name);
 
   @Get() // /tokens?status=INIT
-  async findAll(@Ip() ip: string, @Query('status') status?: StatusEnum) {
+  async findAll(
+    @Ip() ip: string,
+    @Query('status') status?: TokenStatusEnum,
+    @Query('order') orderSymbol?: string,
+  ) {
     this.logger.log(`Request for ALL Tokens\t${ip}`, TokensController.name);
-    const statusValue = status ? status : StatusEnum.All;
-    const tokens = await this.tokensService.findAll(status);
+    const statusValue = status ? status : TokenStatusEnum.All;
+    const tokens = await this.tokensService.findAll(status, orderSymbol);
     return { data: { status: statusValue, tokens } };
   }
 
@@ -41,8 +46,8 @@ export class TokensController {
   }
 
   @Post()
-  async create(@Body() createInput: Prisma.TokenCreateInput) {
-    const createdToken = await this.tokensService.create(createInput);
+  async create(@Body() createTokenDto: CreateTokenDto) {
+    const createdToken = await this.tokensService.create(createTokenDto);
     return { data: createdToken };
   }
 

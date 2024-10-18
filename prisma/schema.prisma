@@ -7,20 +7,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
+enum TokenStatus {
   ALL
   INIT
   ACTIVE
   PENDING
 }
 
+enum OrderStatus {
+  ACTIVE
+  CLOSE
+}
+
+enum StrategyStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderType {
+  BUY
+  SELL
+}
+
+enum StrategyType {
+  BULL
+  BEAR
+}
+
 model Token {
-  id        Int      @id @default(autoincrement())
-  symbol    String   @unique
-  name      String   @unique
+  id         Int         @id @default(autoincrement())
+  symbol     String      @unique
+  name       String      @unique
+  price      Float
+  pair       String      @unique
+  status     TokenStatus
+  orders     Order[]
+  strategies Strategy[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  token     Token       @relation(fields: [symbol], references: [symbol])
+  type      OrderType
+  symbol    String
+  amount    Float
   price     Float
-  pair      String   @unique
-  status    Status
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  fiat      Float
+  status    OrderStatus
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Strategy {
+  id        Int            @id @default(autoincrement())
+  type      StrategyType
+  token     Token          @relation(fields: [symbol], references: [symbol])
+  symbol    String
+  status    StrategyStatus
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 }
