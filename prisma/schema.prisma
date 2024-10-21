@@ -34,6 +34,11 @@ enum StrategyType {
   BEAR
 }
 
+enum AuthRole {
+  USER
+  ADMIN
+}
+
 model Token {
   id         Int         @id @default(autoincrement())
   symbol     String      @unique
@@ -49,13 +54,13 @@ model Token {
 
 model Order {
   id        Int         @id @default(autoincrement())
-  token     Token       @relation(fields: [symbol], references: [symbol])
   type      OrderType
   symbol    String
   amount    Float
   price     Float
   fiat      Float
   status    OrderStatus
+  token     Token       @relation(fields: [symbol], references: [symbol])
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -63,9 +68,57 @@ model Order {
 model Strategy {
   id        Int            @id @default(autoincrement())
   type      StrategyType
-  token     Token          @relation(fields: [symbol], references: [symbol])
   symbol    String
   status    StrategyStatus
+  token     Token          @relation(fields: [symbol], references: [symbol])
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+}
+
+// ============== User:
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+ 
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@id([provider, providerAccountId])
+}
+ 
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+  @@id([identifier, token])
 }
