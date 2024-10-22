@@ -7,6 +7,18 @@ import { DatabaseService } from '../database/database.service';
 export class UserService {
   constructor(private readonly db: DatabaseService) {}
 
+  async findVerifyCode(code: string) {
+    return await this.db.verificationCode.findUnique({ where: { code } });
+
+    /*
+    const res = await this.db.verificationCode.findUnique({ where: { code } });
+    if (res) {
+      this.removeVerifyCode(res.code);
+      return res;
+    }
+    */
+  }
+
   async create(createVerifyCodeDto: {
     identifier: string;
     code: string;
@@ -27,14 +39,6 @@ export class UserService {
       });
     } catch (err) {
       throw new BadReq(err.message);
-    }
-  }
-
-  async findVerifyCode(code: string) {
-    const res = await this.db.verificationCode.findUnique({ where: { code } });
-    if (res) {
-      this.removeVerifyCode(res.code);
-      return res;
     }
   }
 

@@ -15,6 +15,11 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('verify/code/:code')
+  findVerifyCode(@Param('code') code: string) {
+    return this.userService.findVerifyCode(code);
+  }
+
   @Post('verify/code')
   create(
     @Body()
@@ -33,11 +38,6 @@ export class UserController {
   // findAll() {
   //   return this.userService.findAll();
   // }
-
-  @Get('verify/code/:code')
-  findVerifyCode(@Param('code') code: string) {
-    return this.userService.findVerifyCode(code);
-  }
 
   // @Delete('verify/code/:code')
   // removeVerifyCode(@Param('code') code: string) {
