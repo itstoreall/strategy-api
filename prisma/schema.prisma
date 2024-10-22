@@ -122,3 +122,11 @@ model VerificationToken {
   expires    DateTime
   @@id([identifier, token])
 }
+
+model VerificationCode {
+  identifier String
+  code       String
+  url        String
+  expires    DateTime
+  @@id([code])
+}

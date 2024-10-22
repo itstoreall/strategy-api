@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OrdersModule } from './orders/orders.module';
 import { StrategiesModule } from './strategies/strategies.module';
+import { UserModule } from './user/user.module';
 
 const throttlerShort = {
   name: 'short',
@@ -31,6 +32,7 @@ const ThrottlerProvider = {
 
 @Module({
   imports: [
+    UserModule,
     TokensModule,
     OrdersModule,
     StrategiesModule,
