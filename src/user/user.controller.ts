@@ -1,11 +1,12 @@
 import {
   Get,
+  Put,
   Post,
-  // Patch,
-  // Delete,
+  Delete,
   Param,
   Body,
   Controller,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 // import { CreateUserDto } from './dto/create-user.dto';
@@ -15,9 +16,22 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  /*
+  @Get()
+  findAll() {
+    return this.userService.findAll();
+  }
+  */
+
   @Get('verify/code/:code')
   findVerifyCode(@Param('code') code: string) {
     return this.userService.findVerifyCode(code);
+  }
+
+  @Get('account/google/:userId')
+  checkGoogleAccountLinked(@Param('userId') userId: string) {
+    // console.log(1, 'userId ----->', userId);
+    return this.userService.hasGoogleAccountLinked(userId);
   }
 
   @Post('verify/code')
@@ -34,15 +48,20 @@ export class UserController {
     // return createVerifyCodeDto;
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.userService.findAll();
-  // }
+  @Put('update-name')
+  setName(@Body() body: { name: string; userId: string }) {
+    return this.userService.updateName(body.userId, body.name);
+  }
 
-  // @Delete('verify/code/:code')
-  // removeVerifyCode(@Param('code') code: string) {
-  //   return this.userService.removeVerifyCode(code);
-  // }
+  @Delete('verify/code/:code')
+  removeVerifyCode(@Param('code') code: string) {
+    return this.userService.deleteVerifyCode(code);
+  }
+
+  @Delete('account/google/:userId')
+  unlinkGoogleAccount(@Param('userId') userId: string) {
+    return this.userService.deleteGoogleAccount(userId);
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

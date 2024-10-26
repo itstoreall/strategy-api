@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException as BadReq,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 // import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
@@ -17,6 +22,31 @@ export class UserService {
       return res;
     }
     */
+  }
+
+  async hasGoogleAccountLinked(userId: string): Promise<boolean> {
+    // console.log(2, 'userId ----->', userId);
+
+    try {
+      const result = await this.db.account.findFirst({
+        where: {
+          provider: 'google',
+          userId: userId,
+        },
+      });
+
+      // console.log(3, 'result:', result !== null);
+      return result !== null;
+    } catch (err) {
+      throw new BadReq(err.message);
+    }
+
+    // const hasGoogleLinked =
+    //   await this.userService.hasGoogleAccountLinked(userId);
+    // if (!hasGoogleLinked) {
+    //   throw new UnauthorizedException('No Google account linked');
+    // }
+    // return { hasGoogleLinked };
   }
 
   async create(createVerifyCodeDto: {
@@ -42,8 +72,39 @@ export class UserService {
     }
   }
 
-  async removeVerifyCode(code: string) {
+  async updateName(userId: string, name: string): Promise<boolean> {
+    try {
+      await this.db.user.update({
+        where: { id: userId },
+        data: { name: name.trim() },
+      });
+      return true;
+    } catch (err) {
+      throw new BadRequestException('Failed to set user name:', err.message);
+    }
+  }
+
+  async deleteVerifyCode(code: string) {
     return await this.db.verificationCode.delete({ where: { code } });
+  }
+
+  async deleteGoogleAccount(userId: string): Promise<boolean> {
+    try {
+      const deletedAccount = await this.db.account.deleteMany({
+        where: {
+          provider: 'google',
+          userId: userId,
+        },
+      });
+
+      if (deletedAccount.count === 0) {
+        throw new NotFoundException('Google account not found');
+      }
+
+      return true;
+    } catch (err) {
+      throw new BadReq(err.message);
+    }
   }
 
   /*
