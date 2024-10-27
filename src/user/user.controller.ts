@@ -6,7 +6,7 @@ import {
   Param,
   Body,
   Controller,
-  UnauthorizedException,
+  // UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 // import { CreateUserDto } from './dto/create-user.dto';
@@ -22,6 +22,16 @@ export class UserController {
     return this.userService.findAll();
   }
   */
+
+  @Get('role/:userId')
+  getUserRole(@Param('userId') userId: string) {
+    return this.userService.getUserRole(userId);
+    // const userId = request.user?.id; // Or however your session ID is accessed
+    // if (!userId) {
+    //   throw new UnauthorizedException('User is not authenticated');
+    // }
+    // return { role: await this.userService.getUserRole(userId) };
+  }
 
   @Get('verify/code/:code')
   findVerifyCode(@Param('code') code: string) {

@@ -12,6 +12,12 @@ import { DatabaseService } from '../database/database.service';
 export class UserService {
   constructor(private readonly db: DatabaseService) {}
 
+  async getUserRole(userId: string): Promise<{ role: 'USER' | 'ADMIN' }> {
+    const user = await this.db.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+    return { role: user.role };
+  }
+
   async findVerifyCode(code: string) {
     return await this.db.verificationCode.findUnique({ where: { code } });
 
