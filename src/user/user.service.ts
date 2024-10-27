@@ -3,10 +3,16 @@ import {
   BadRequestException as BadReq,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 // import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from '../database/database.service';
+
+type UpdateNameRes = Promise<{ updated: boolean }>;
+type AccountStatusRes = Promise<{ status: boolean }>;
+type DeleteTokensRes = Promise<{ deletedCount: number }>;
+type UnlinkAccountRes = Promise<{ unlinked: boolean }>;
 
 @Injectable()
 export class UserService {
@@ -30,29 +36,18 @@ export class UserService {
     */
   }
 
-  async hasGoogleAccountLinked(userId: string): Promise<boolean> {
-    // console.log(2, 'userId ----->', userId);
-
+  async hasGoogleAccountLinked(userId: string): AccountStatusRes {
     try {
-      const result = await this.db.account.findFirst({
+      const hasGoogleLinked = await this.db.account.findFirst({
         where: {
           provider: 'google',
           userId: userId,
         },
       });
-
-      // console.log(3, 'result:', result !== null);
-      return result !== null;
+      return { status: hasGoogleLinked !== null };
     } catch (err) {
-      throw new BadReq(err.message);
+      throw new UnauthorizedException('No Google account linked:', err);
     }
-
-    // const hasGoogleLinked =
-    //   await this.userService.hasGoogleAccountLinked(userId);
-    // if (!hasGoogleLinked) {
-    //   throw new UnauthorizedException('No Google account linked');
-    // }
-    // return { hasGoogleLinked };
   }
 
   async create(createVerifyCodeDto: {
@@ -60,9 +55,10 @@ export class UserService {
     code: string;
     url: string;
   }) {
-    const nowPlus24Hours = new Date();
-    nowPlus24Hours.setHours(nowPlus24Hours.getHours() + 24); // Add 24 hours
-    const nowUTCPlus24Hours = nowPlus24Hours.toISOString();
+    const expire = new Date();
+    const plusHours = 24;
+    expire.setHours(expire.getHours() + plusHours);
+    const CustomUTC = expire.toISOString();
 
     try {
       return await this.db.verificationCode.create({
@@ -70,7 +66,7 @@ export class UserService {
           identifier: createVerifyCodeDto.identifier,
           code: createVerifyCodeDto.code,
           url: createVerifyCodeDto.url,
-          expires: nowUTCPlus24Hours,
+          expires: CustomUTC,
         },
       });
     } catch (err) {
@@ -78,15 +74,34 @@ export class UserService {
     }
   }
 
-  async updateName(userId: string, name: string): Promise<boolean> {
+  async updateName(userId: string, name: string): UpdateNameRes {
     try {
       await this.db.user.update({
         where: { id: userId },
         data: { name: name.trim() },
       });
-      return true;
+      return { updated: true };
     } catch (err) {
       throw new BadRequestException('Failed to set user name:', err.message);
+    }
+  }
+
+  async clearExpiredTokens(): DeleteTokensRes {
+    const expire = new Date();
+    const plusHours = 24;
+    expire.setHours(expire.getHours() + plusHours);
+    const CustomUTC = expire.toISOString();
+
+    try {
+      const res = await this.db.verificationToken.deleteMany({
+        where: { expires: { lt: CustomUTC } },
+      });
+      return { deletedCount: res.count };
+    } catch (err) {
+      throw new BadRequestException(
+        'Failed to clear expired tokens',
+        err.message,
+      );
     }
   }
 
@@ -94,7 +109,7 @@ export class UserService {
     return await this.db.verificationCode.delete({ where: { code } });
   }
 
-  async deleteGoogleAccount(userId: string): Promise<boolean> {
+  async deleteGoogleAccount(userId: string): UnlinkAccountRes {
     try {
       const deletedAccount = await this.db.account.deleteMany({
         where: {
@@ -107,7 +122,7 @@ export class UserService {
         throw new NotFoundException('Google account not found');
       }
 
-      return true;
+      return { unlinked: true };
     } catch (err) {
       throw new BadReq(err.message);
     }

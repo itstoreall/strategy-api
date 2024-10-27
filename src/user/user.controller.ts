@@ -63,6 +63,11 @@ export class UserController {
     return this.userService.updateName(body.userId, body.name);
   }
 
+  @Delete('token/remove-expired')
+  clearExpiredTokens() {
+    return this.userService.clearExpiredTokens();
+  }
+
   @Delete('verify/code/:code')
   removeVerifyCode(@Param('code') code: string) {
     return this.userService.deleteVerifyCode(code);
