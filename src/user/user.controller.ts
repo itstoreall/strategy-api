@@ -6,11 +6,13 @@ import {
   Param,
   Body,
   Controller,
-  // UnauthorizedException,
 } from '@nestjs/common';
+import { UpdateCredentialsDto } from './dto/update-credentials.dto';
+import { CreateVerifyCodeDto } from './dto/create-verify-code.dto';
+import { UpdateNameDto } from './dto/update-name.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 import { UserService } from './user.service';
-// import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -26,50 +28,51 @@ export class UserController {
   @Get('role/:userId')
   getUserRole(@Param('userId') userId: string) {
     return this.userService.getUserRole(userId);
-    // const userId = request.user?.id; // Or however your session ID is accessed
-    // if (!userId) {
-    //   throw new UnauthorizedException('User is not authenticated');
-    // }
-    // return { role: await this.userService.getUserRole(userId) };
   }
 
-  @Get('verify/code/:code')
-  findVerifyCode(@Param('code') code: string) {
-    return this.userService.findVerifyCode(code);
+  @Get('email/:email')
+  getUserByEmail(@Param('email') email: string) {
+    return this.userService.getUserByEmail(email);
   }
 
   @Get('account/google/:userId')
   checkGoogleAccountLinked(@Param('userId') userId: string) {
-    // console.log(1, 'userId ----->', userId);
     return this.userService.hasGoogleAccountLinked(userId);
   }
 
+  @Post('auth/signup')
+  signUp(@Body() body: SignUpDto) {
+    return this.userService.signUp(body.email, body.password);
+  }
+
+  @Post('auth/signin')
+  signIn(@Body() body: SignInDto) {
+    return this.userService.signIn(body.email, body.password);
+  }
+
   @Post('verify/code')
-  create(
-    @Body()
-    createVerifyCodeDto: {
-      identifier: string;
-      code: string;
-      url: string;
-    },
-  ) {
+  createVerifyCode(@Body() createVerifyCodeDto: CreateVerifyCodeDto) {
     console.log('createVerifyCodeDto:', createVerifyCodeDto);
-    return this.userService.create(createVerifyCodeDto);
-    // return createVerifyCodeDto;
+    return this.userService.createVerifyCode(createVerifyCodeDto);
   }
 
   @Put('update-name')
-  setName(@Body() body: { name: string; userId: string }) {
+  setName(@Body() body: UpdateNameDto) {
     return this.userService.updateName(body.userId, body.name);
   }
 
+  @Put('verify/credentials')
+  updateCredentials(@Body() body: UpdateCredentialsDto) {
+    return this.userService.updateCredentials(body);
+  }
+
   @Delete('token/remove-expired')
-  clearExpiredTokens() {
-    return this.userService.clearExpiredTokens();
+  deleteExpiredTokens() {
+    return this.userService.deleteExpiredTokens();
   }
 
   @Delete('verify/code/:code')
-  removeVerifyCode(@Param('code') code: string) {
+  deleteVerifyCode(@Param('code') code: string) {
     return this.userService.deleteVerifyCode(code);
   }
 
@@ -77,9 +80,4 @@ export class UserController {
   unlinkGoogleAccount(@Param('userId') userId: string) {
     return this.userService.deleteGoogleAccount(userId);
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
 }
