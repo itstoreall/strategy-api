@@ -12,7 +12,12 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new ExceptionsFilter(httpAdapter));
 
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.STRATEGY_CLIENT_BASE_URL,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   app.setGlobalPrefix('api', { exclude: ['/', '/api'] });
 
   await app.listen(port);
