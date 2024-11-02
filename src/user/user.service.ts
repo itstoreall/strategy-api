@@ -32,7 +32,8 @@ export class UserService {
 
   async getUserByEmail(email: string): Promise<UserResDto> {
     const user = await this.db.user.findUnique({ where: { email } });
-    if (!user) throw new NotFound('User not found');
+    // if (!user) throw new NotFound('User not found');
+    if (!user) return null;
     const trimmedPassword = this.trimString(user.password, 5, 5);
     return {
       email: user.email,
