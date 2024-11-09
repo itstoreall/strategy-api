@@ -43,9 +43,9 @@ export class UserController {
     return this.userService.signIn(body.email, body.password);
   }
 
-  @Post('verify/token')
+  @Post('auth/signup-verify')
   createVerifyCode(@Body() createVerifyCodeDto: CreateVerifyCodeDto) {
-    console.log('createVerifyCodeDto:', createVerifyCodeDto);
+    console.log('createVerifyCodeDto - signup-verify:', createVerifyCodeDto);
     return this.userService.createVerifyCode(createVerifyCodeDto);
   }
 
