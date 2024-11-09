@@ -13,7 +13,10 @@ async function bootstrap() {
   app.useGlobalFilters(new ExceptionsFilter(httpAdapter));
 
   app.enableCors({
-    origin: process.env.STRATEGY_CLIENT_BASE_URL,
+    origin: [
+      process.env.STRATEGY_CLIENT_BASE_URL,
+      process.env.STRATEGY_CLIENT_LOCAL_URL,
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
