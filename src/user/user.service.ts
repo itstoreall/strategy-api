@@ -132,7 +132,7 @@ export class UserService {
       return await this.db.verificationCode.create({
         data: {
           identifier: createVerifyCodeDto.identifier,
-          code: createVerifyCodeDto.code,
+          code: createVerifyCodeDto.token,
           url: '/',
           expires: CustomUTC,
         },
@@ -169,10 +169,12 @@ export class UserService {
 
   async updateName(userId: string, name: string): Promise<UpdateNameResDto> {
     try {
-      await this.db.user.update({
+      console.log('userId | name:', userId, name);
+      const res = await this.db.user.update({
         where: { id: userId },
         data: { name: name.trim() },
       });
+      console.log('res:', res);
       return { updated: true };
     } catch (err) {
       throw new BadReq('Failed to set user name:', err.message);

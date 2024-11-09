@@ -43,7 +43,7 @@ export class UserController {
     return this.userService.signIn(body.email, body.password);
   }
 
-  @Post('verify/code')
+  @Post('verify/token')
   createVerifyCode(@Body() createVerifyCodeDto: CreateVerifyCodeDto) {
     console.log('createVerifyCodeDto:', createVerifyCodeDto);
     return this.userService.createVerifyCode(createVerifyCodeDto);
@@ -64,9 +64,9 @@ export class UserController {
     return this.userService.deleteExpiredTokens();
   }
 
-  @Delete('verify/code/:code')
-  deleteVerifyCode(@Param('code') code: string) {
-    return this.userService.deleteVerifyCode(code);
+  @Delete('verify/token/:token')
+  deleteVerifyCode(@Param('token') token: string) {
+    return this.userService.deleteVerifyCode(token);
   }
 
   @Delete('account/google/:userId')

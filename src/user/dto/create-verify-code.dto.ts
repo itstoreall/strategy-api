@@ -7,5 +7,5 @@ export class CreateVerifyCodeDto {
 
   @IsString({ message: 'Code must be a string!' })
   @IsNotEmpty()
-  code: string;
+  token: string;
 }
