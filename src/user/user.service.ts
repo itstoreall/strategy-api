@@ -132,7 +132,7 @@ export class UserService {
       return await this.db.verificationCode.create({
         data: {
           identifier: createVerifyCodeDto.identifier,
-          code: createVerifyCodeDto.token,
+          code: createVerifyCodeDto.code,
           url: '/',
           expires: CustomUTC,
         },

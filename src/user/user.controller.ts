@@ -43,20 +43,20 @@ export class UserController {
     return this.userService.signIn(body.email, body.password);
   }
 
-  @Post('auth/signup-verify')
+  @Post('verify/code')
   createVerifyCode(@Body() createVerifyCodeDto: CreateVerifyCodeDto) {
     console.log('createVerifyCodeDto - signup-verify:', createVerifyCodeDto);
     return this.userService.createVerifyCode(createVerifyCodeDto);
   }
 
-  @Put('update-name')
-  setName(@Body() body: UpdateNameDto) {
-    return this.userService.updateName(body.userId, body.name);
-  }
-
   @Put('verify/credentials')
   updateCredentials(@Body() body: UpdateCredentialsDto) {
     return this.userService.updateCredentials(body);
+  }
+
+  @Put('update-name')
+  setName(@Body() body: UpdateNameDto) {
+    return this.userService.updateName(body.userId, body.name);
   }
 
   @Delete('token/remove-expired')
