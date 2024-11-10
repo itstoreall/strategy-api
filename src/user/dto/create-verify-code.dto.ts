@@ -5,7 +5,7 @@ export class CreateVerifyCodeDto {
   @IsNotEmpty()
   identifier: string;
 
-  @IsString({ message: 'Code must be a string!' })
-  @IsNotEmpty()
-  code: string;
+  // @IsString({ message: 'Code must be a string!' })
+  // @IsNotEmpty()
+  // code: string;
 }

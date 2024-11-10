@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UpdateCredentialsResDto } from './dto/update-credentials-res.dto';
-import { CreateVerifyCodeResDto } from './dto/create-verify-code-res.dto';
+// import { CreateVerifyCodeResDto } from './dto/create-verify-code-res.dto';
 import { DeleteVerifyCodeResDto } from './dto/delete-verify-code-res.dto';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { CreateVerifyCodeDto } from './dto/create-verify-code.dto';
@@ -20,6 +20,8 @@ import { SignUpResDto } from './dto/sign-up-res.dto';
 import { SignInResDto } from './dto/sign-in-res.dto';
 import { UserResDto } from './dto/user-res.dto';
 import { DatabaseService } from '../database/database.service';
+
+import { createTransport } from 'nodemailer';
 
 type TrimString = (address: string, start: number, end: number) => string;
 
@@ -117,7 +119,7 @@ export class UserService {
 
   async createVerifyCode(
     createVerifyCodeDto: CreateVerifyCodeDto,
-  ): Promise<CreateVerifyCodeResDto> {
+  ): Promise<boolean> {
     const expire = new Date();
     const plusHours = 24;
     expire.setHours(expire.getHours() + plusHours);
@@ -128,7 +130,59 @@ export class UserService {
         createVerifyCodeDto.identifier,
       );
 
+      // console.log('res:', res);
+
+      let verifyCode = '';
+      for (let i = 0; i < 4; i++) {
+        verifyCode += Math.floor(Math.random() * 10);
+      }
+
+      // console.log('verifyCode:', verifyCode);
+
+      if (res) await this.deleteVerifyCode(verifyCode);
+
+      const transport = createTransport({
+        host: process.env.EMAIL_SERVER_HOST,
+        port: parseInt(process.env.EMAIL_SERVER_PORT!, 10),
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+      });
+
+      const message = {
+        to: createVerifyCodeDto.identifier,
+        from: process.env.EMAIL_FROM,
+        subject: 'Your Verification Code',
+        text: `Your verification code is: ${verifyCode}`,
+        html: `<p>Your verification code is: <strong>${verifyCode}</strong></p>`,
+      };
+
+      const sentRes = await transport.sendMail(message);
+
+      // console.log('sentRes:', sentRes);
+
+      if (sentRes.accepted.includes(createVerifyCodeDto.identifier)) {
+        // console.log('sentRes.accepted:', sentRes.accepted);
+
+        const createdData = await this.db.verificationCode.create({
+          data: {
+            identifier: createVerifyCodeDto.identifier,
+            code: verifyCode,
+            url: '/',
+            expires: CustomUTC,
+          },
+        });
+
+        if (createdData) {
+          return true;
+        } else return false;
+      } else return null;
+      // }
+
+      /*
       if (res) await this.deleteVerifyCode(res.code);
+
       return await this.db.verificationCode.create({
         data: {
           identifier: createVerifyCodeDto.identifier,
@@ -137,6 +191,7 @@ export class UserService {
           expires: CustomUTC,
         },
       });
+      */
     } catch (err) {
       throw new BadReq(err.message);
     }
