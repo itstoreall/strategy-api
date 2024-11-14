@@ -6,7 +6,6 @@ import {
   Inject,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-// import { createTransport } from 'nodemailer';
 import { UpdateCredentialsResDto } from './dto/update-credentials-res.dto';
 import { DeleteVerifyCodeResDto } from './dto/delete-verify-code-res.dto';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
@@ -188,13 +187,11 @@ export class UserService {
 
   async updateName(userId: string, name: string): Promise<UpdateNameResDto> {
     try {
-      console.log('userId | name:', userId, name);
-      const res = await this.db.user.update({
+      const updatedUser = await this.db.user.update({
         where: { id: userId },
         data: { name: name.trim() },
       });
-      console.log('res:', res);
-      return { updated: true };
+      return { updated: updatedUser.name === name };
     } catch (err) {
       throw new BadReq('Failed to set user name:', err.message);
     }
@@ -237,5 +234,20 @@ export class UserService {
     } catch (err) {
       throw new BadReq(err.message);
     }
+  }
+
+  async deleteUserById(userId: string): Promise<{ deleted: boolean }> {
+    const user = await this.db.user.findUnique({ where: { id: userId } });
+    if (!user) return { deleted: false };
+
+    // Delete associates:
+    await this.db.account.deleteMany({ where: { userId } });
+    await this.db.session.deleteMany({ where: { userId } });
+    await this.db.verificationCode.deleteMany({
+      where: { identifier: user.email },
+    });
+
+    const res = await this.db.user.delete({ where: { id: userId } });
+    return { deleted: res ? true : false };
   }
 }

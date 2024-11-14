@@ -73,4 +73,10 @@ export class UserController {
   unlinkGoogleAccount(@Param('userId') userId: string) {
     return this.userService.deleteGoogleAccount(userId);
   }
+
+  @Delete('delete/:userId')
+  deleteUser(@Param('userId') userId: string) {
+    console.log('userId:', userId);
+    return this.userService.deleteUserById(userId);
+  }
 }
