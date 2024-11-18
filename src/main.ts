@@ -15,7 +15,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       process.env.STRATEGY_CLIENT_BASE_URL,
-      process.env.STRATEGY_CLIENT_LOCAL_URL,
+      process.env.STRATEGY_CLIENT_LOCAL_HTTPS_URL,
+      process.env.STRATEGY_CLIENT_LOCAL_HTTP_URL,
     ],
     // origin: true,
     methods: 'GET,POST,PUT,DELETE', // HEAD,PATCH

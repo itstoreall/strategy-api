@@ -10,6 +10,7 @@ import {
   Controller,
   ParseIntPipe,
   UseInterceptors,
+  Options,
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateTokenDto } from './dto/create-token.dto';
@@ -23,6 +24,11 @@ import { LoggerService } from '../logger/logger.service';
 export class TokensController {
   constructor(private readonly tokensService: TokensService) {}
   private readonly logger = new LoggerService(TokensController.name);
+
+  @Options()
+  handleOptions() {
+    return {};
+  }
 
   /* /tokens?status=INIT&order_symbol=btc */
 
