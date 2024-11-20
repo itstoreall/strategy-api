@@ -41,28 +41,36 @@ export class TokensService {
   }
 
   async create(createTokenDto: CreateTokenDto) {
-    const createdPair = `${createTokenDto.symbol.toUpperCase()}USDT`;
+    const tokenSymbol = createTokenDto.symbol.toUpperCase();
+    const tokenName = createTokenDto.name.toLowerCase();
+
+    const createdPair = `${tokenSymbol}USDT`;
     const pairRegex = /^[A-Z]+USDT$/;
     if (!pairRegex.test(createdPair)) throw new BadReq('Invalid pair format!');
 
-    const checkParam = { where: { symbol: createTokenDto.symbol } };
+    const checkParam = { where: { symbol: tokenSymbol } };
     const token = await this.db.token.findUnique(checkParam);
-    if (token) throw new BadReq('Token already exists!');
+    if (token) {
+      console.log(1);
+      throw new BadReq('Token already exists!');
+    }
 
     try {
       const price = await this.binance.getTokenPriceByPair(createdPair);
-      const { symbol, name } = createTokenDto;
 
       const newToken: Prisma.TokenCreateInput = {
-        symbol,
-        name,
+        symbol: tokenSymbol,
+        name: tokenName,
         price: +price[createdPair],
         pair: createdPair,
         status: TokenStatusEnum.Init,
       };
 
-      return await this.db.token.create({ data: newToken });
+      const res = await this.db.token.create({ data: newToken });
+      console.log('res:', res);
+      return res;
     } catch (err) {
+      console.log(2);
       throw new BadReq(err.message);
     }
   }
