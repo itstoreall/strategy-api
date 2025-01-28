@@ -15,25 +15,20 @@ export class OrdersService {
     });
   }
 
-  async create(createOrderDto: CreateOrderDto) {
+  async findAllByUserId(userId: string) {
     try {
-      const checkParam = { where: { symbol: createOrderDto.symbol } };
-      const token = await this.db.token.findUnique(checkParam);
-      if (!token) throw new BadReq('Token not found!');
+      const userOrders = await this.db.order.findMany({
+        where: { userId },
+        orderBy: { updatedAt: 'desc' },
+      });
 
-      const { amount, price } = createOrderDto;
-      const fiat = amount * price;
+      // if (!userOrders.length) {
+      //   throw new BadReq(`No orders found for userId: ${userId}`);
+      // }
 
-      const newOrder: Prisma.OrderCreateInput = {
-        type: OrderTypeEnum.Buy,
-        amount,
-        price,
-        fiat,
-        status: OrderStatusEnum.Active,
-        token: { connect: { symbol: token.symbol } },
-      };
+      console.log('userOrders:', userOrders);
 
-      return await this.db.order.create({ data: newOrder });
+      return userOrders;
     } catch (err) {
       throw new BadReq(err.message);
     }
@@ -41,6 +36,35 @@ export class OrdersService {
 
   async findById(id: number) {
     return await this.db.order.findUnique({ where: { id } });
+  }
+
+  async create(createOrderDto: CreateOrderDto) {
+    console.log('serv createOrderDto:', createOrderDto);
+    try {
+      const checkParam = { where: { id: createOrderDto.userId } };
+      const userData = await this.db.user.findUnique(checkParam);
+
+      const { amount, price } = createOrderDto;
+      const fiat = amount * price;
+
+      if (createOrderDto.userId !== userData.id) {
+        throw new BadReq('UserId do not match');
+      }
+
+      const newOrder: Prisma.OrderCreateInput = {
+        type: OrderTypeEnum.Buy,
+        amount,
+        price,
+        fiat,
+        status: OrderStatusEnum.Active,
+        token: { connect: { symbol: createOrderDto.symbol } },
+        userId: createOrderDto.userId,
+      };
+
+      return await this.db.order.create({ data: newOrder });
+    } catch (err) {
+      throw new BadReq(err.message);
+    }
   }
 
   async updateOrderById(id: number, updateTokenDto: UpdateOrderDto) {

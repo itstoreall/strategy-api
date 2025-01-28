@@ -33,6 +33,13 @@ export class OrdersController {
     return this.ordersService.findById(+id);
   }
 
+  @Get('user/:userId')
+  findAllByUserId(@Param('userId') userId: string, @Ip() ip: string) {
+    console.log('userId ==>', userId);
+    this.logger.log(`Req for Orders ${userId}\t${ip}`, OrdersController.name);
+    return this.ordersService.findAllByUserId(userId);
+  }
+
   /* JSON Content:
   { 
     "type": "BUY", 
@@ -44,6 +51,7 @@ export class OrdersController {
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
+    console.log('createOrderDto:', createOrderDto);
     return this.ordersService.create(createOrderDto);
   }
 

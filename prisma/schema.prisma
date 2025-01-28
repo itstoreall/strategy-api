@@ -39,6 +39,8 @@ enum AuthRole {
   ADMIN
 }
 
+// ---
+
 model Token {
   id         Int         @id @default(autoincrement())
   symbol     String      @unique
@@ -61,6 +63,7 @@ model Order {
   fiat      Float
   status    OrderStatus
   token     Token       @relation(fields: [symbol], references: [symbol])
+  userId    String
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }

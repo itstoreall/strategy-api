@@ -17,4 +17,8 @@ export class CreateOrderDto {
   @IsNumber({}, { message: 'valid price required!' })
   @IsNotEmpty()
   price: number;
+
+  @IsString({ message: 'valid userId required!' })
+  @IsNotEmpty()
+  userId: string;
 }
