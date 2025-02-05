@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { OrderTypeEnum } from '../../enum';
+import { OrderTypeEnum, ExchangeEnum } from '../../enum';
 
 export class CreateOrderDto {
   @IsEnum(OrderTypeEnum, { message: 'valid order type required!' })
@@ -9,6 +9,10 @@ export class CreateOrderDto {
   @IsString({ message: 'valid symbol required!' })
   @IsNotEmpty()
   symbol: string;
+
+  @IsString({ message: 'valid exchange required!' })
+  @IsNotEmpty()
+  exchange: ExchangeEnum;
 
   @IsNumber({}, { message: 'valid amount required!' })
   @IsNotEmpty()

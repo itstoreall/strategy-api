@@ -44,7 +44,7 @@ export class OrdersService {
       const checkParam = { where: { id: createOrderDto.userId } };
       const userData = await this.db.user.findUnique(checkParam);
 
-      const { amount, price } = createOrderDto;
+      const { amount, price, exchange } = createOrderDto;
       const fiat = amount * price;
 
       if (createOrderDto.userId !== userData.id) {
@@ -58,6 +58,7 @@ export class OrdersService {
         fiat,
         status: OrderStatusEnum.Active,
         token: { connect: { symbol: createOrderDto.symbol } },
+        exchange,
         userId: createOrderDto.userId,
       };
 
