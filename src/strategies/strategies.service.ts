@@ -93,9 +93,11 @@ export class StrategiesService {
       where: { type, token: { symbol: symbolUpperCase }, userId },
     });
 
+    console.log('existingStrategy:', existingStrategy);
+
     if (existingStrategy) {
       const errorMsg = `strategy ${type} ${symbolUpperCase} already exists`;
-      // console.error(errorMsg);
+      console.error(errorMsg);
       return errorMsg;
     }
 
@@ -105,6 +107,8 @@ export class StrategiesService {
       token: { connect: { symbol: symbolUpperCase } },
       userId,
     };
+
+    console.log('newStrategy:', newStrategy);
 
     return await this.db.strategy.create({ data: newStrategy });
   }

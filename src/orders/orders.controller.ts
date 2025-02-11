@@ -35,7 +35,6 @@ export class OrdersController {
 
   @Get('user/:userId')
   findAllByUserId(@Param('userId') userId: string, @Ip() ip: string) {
-    console.log('userId ==>', userId);
     this.logger.log(`Req for Orders ${userId}\t${ip}`, OrdersController.name);
     return this.ordersService.findAllByUserId(userId);
   }
