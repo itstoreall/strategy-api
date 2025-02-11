@@ -11,6 +11,9 @@ CREATE TYPE "StrategyStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 CREATE TYPE "OrderType" AS ENUM ('BUY', 'SELL');
 
 -- CreateEnum
+CREATE TYPE "Exchange" AS ENUM ('BINANCE', 'BYBIT', 'MEXC', 'BITGET', 'BINGX', 'OKX');
+
+-- CreateEnum
 CREATE TYPE "StrategyType" AS ENUM ('BULL', 'BEAR');
 
 -- CreateEnum
@@ -39,6 +42,8 @@ CREATE TABLE "Order" (
     "price" DOUBLE PRECISION NOT NULL,
     "fiat" DOUBLE PRECISION NOT NULL,
     "status" "OrderStatus" NOT NULL,
+    "exchange" "Exchange" NOT NULL,
+    "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -51,6 +56,7 @@ CREATE TABLE "Strategy" (
     "type" "StrategyType" NOT NULL,
     "symbol" TEXT NOT NULL,
     "status" "StrategyStatus" NOT NULL,
+    "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -62,8 +68,10 @@ CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT,
     "email" TEXT NOT NULL,
+    "password" TEXT,
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
+    "role" "AuthRole" NOT NULL DEFAULT 'USER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -105,6 +113,16 @@ CREATE TABLE "VerificationToken" (
     "expires" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "VerificationToken_pkey" PRIMARY KEY ("identifier","token")
+);
+
+-- CreateTable
+CREATE TABLE "VerificationCode" (
+    "identifier" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "VerificationCode_pkey" PRIMARY KEY ("code")
 );
 
 -- CreateIndex
