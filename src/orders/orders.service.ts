@@ -62,7 +62,7 @@ export class OrdersService {
           ? StrategyTypeEnum.Bull
           : StrategyTypeEnum.Bear;
 
-      this.strategiesService.create({
+      await this.strategiesService.create({
         type: strategyType,
         status: StrategyStatusEnum.Active,
         symbol: createOrderDto.symbol,
