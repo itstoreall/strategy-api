@@ -13,4 +13,8 @@ export class CreateStrategyDto {
   @IsEnum(StrategyStatusEnum, { message: 'valid status required!' })
   @IsNotEmpty()
   status: StrategyStatusEnum;
+
+  @IsString({ message: 'valid userId required!' })
+  @IsNotEmpty()
+  userId: string;
 }

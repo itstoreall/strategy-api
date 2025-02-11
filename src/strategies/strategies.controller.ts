@@ -34,14 +34,14 @@ export class StrategiesController {
     return this.strategiesService.findAll(strategyType, extend);
   }
 
-  @Post()
-  create(@Body() createStrategyDto: CreateStrategyDto) {
-    return this.strategiesService.create(createStrategyDto);
-  }
-
   @Get('id/:id')
   findById(@Param('id', ParseIntPipe) id: string) {
     return this.strategiesService.findById(+id);
+  }
+
+  @Post()
+  create(@Body() createStrategyDto: CreateStrategyDto) {
+    return this.strategiesService.create(createStrategyDto);
   }
 
   @Put('id/:id')

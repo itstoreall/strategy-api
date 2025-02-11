@@ -48,10 +48,8 @@ export class OrdersController {
     "amount": 1.6 
   }
   */
-
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    console.log('createOrderDto:', createOrderDto);
     return this.ordersService.create(createOrderDto);
   }
 

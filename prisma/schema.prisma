@@ -72,7 +72,7 @@ model Order {
   fiat      Float
   status    OrderStatus
   token     Token       @relation(fields: [symbol], references: [symbol])
-  exchange  Exchange?
+  exchange  Exchange
   userId    String
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
@@ -84,6 +84,7 @@ model Strategy {
   symbol    String
   status    StrategyStatus
   token     Token          @relation(fields: [symbol], references: [symbol])
+  userId    String
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 }

@@ -1,13 +1,22 @@
 import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { OrderStatusEnum, OrderTypeEnum } from '../enum';
+import { StrategiesService } from '../strategies/strategies.service';
 import { DatabaseService } from '../database/database.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import {
+  OrderStatusEnum,
+  OrderTypeEnum,
+  StrategyStatusEnum,
+  StrategyTypeEnum,
+} from '../enum';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly strategiesService: StrategiesService,
+  ) {}
 
   async findAll() {
     return await this.db.order.findMany({
@@ -26,8 +35,6 @@ export class OrdersService {
       //   throw new BadReq(`No orders found for userId: ${userId}`);
       // }
 
-      console.log('userOrders:', userOrders);
-
       return userOrders;
     } catch (err) {
       throw new BadReq(err.message);
@@ -39,7 +46,6 @@ export class OrdersService {
   }
 
   async create(createOrderDto: CreateOrderDto) {
-    console.log('serv createOrderDto:', createOrderDto);
     try {
       const checkParam = { where: { id: createOrderDto.userId } };
       const userData = await this.db.user.findUnique(checkParam);
@@ -50,6 +56,18 @@ export class OrdersService {
       if (createOrderDto.userId !== userData.id) {
         throw new BadReq('UserId do not match');
       }
+
+      const strategyType =
+        createOrderDto.type === OrderTypeEnum.Buy
+          ? StrategyTypeEnum.Bull
+          : StrategyTypeEnum.Bear;
+
+      this.strategiesService.create({
+        type: strategyType,
+        status: StrategyStatusEnum.Active,
+        symbol: createOrderDto.symbol,
+        userId: createOrderDto.userId,
+      });
 
       const newOrder: Prisma.OrderCreateInput = {
         type: OrderTypeEnum.Buy,

@@ -4,6 +4,7 @@ import { StrategiesService } from './strategies.service';
 import { DatabaseService } from 'src/database/database.service';
 
 @Module({
+  exports: [StrategiesService],
   controllers: [StrategiesController],
   providers: [StrategiesService, DatabaseService],
 })

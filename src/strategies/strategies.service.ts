@@ -69,31 +69,44 @@ export class StrategiesService {
     return res;
   }
 
+  async findById(id: number) {
+    return await this.db.strategy.findUnique({ where: { id } });
+  }
+
   /* JSON Content:
   { 
-    "type": "BEAR",
+    "type": "BULL",
     "symbol": "apt",
-    "status": "INACTIVE"
+    "status": "INACTIVE",
+    "userId": "dwedwedwedwedwed"
   }
   */
   async create(createStrategyDto: CreateStrategyDto) {
-    const checkParam = { where: { symbol: createStrategyDto.symbol } };
+    const { type, symbol, status, userId } = createStrategyDto;
+    const symbolUpperCase = symbol.toUpperCase();
+    const checkParam = { where: { symbol: symbolUpperCase } };
     const token = await this.db.token.findUnique(checkParam);
+
     if (!token) throw new BadReq('Token not found!');
 
-    const { type, symbol, status } = createStrategyDto;
+    const existingStrategy = await this.db.strategy.findFirst({
+      where: { type, token: { symbol: symbolUpperCase }, userId },
+    });
+
+    if (existingStrategy) {
+      const errorMsg = `strategy ${type} ${symbolUpperCase} already exists`;
+      // console.error(errorMsg);
+      return errorMsg;
+    }
 
     const newStrategy: Prisma.StrategyCreateInput = {
       type,
       status,
-      token: { connect: { symbol } },
+      token: { connect: { symbol: symbolUpperCase } },
+      userId,
     };
 
     return await this.db.strategy.create({ data: newStrategy });
-  }
-
-  async findById(id: number) {
-    return await this.db.strategy.findUnique({ where: { id } });
   }
 
   async updateStrategyById(id: number, updateStrategyDto: UpdateStrategyDto) {
