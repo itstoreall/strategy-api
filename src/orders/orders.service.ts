@@ -70,7 +70,7 @@ export class OrdersService {
       });
 
       const newOrder: Prisma.OrderCreateInput = {
-        type: OrderTypeEnum.Buy,
+        type: createOrderDto.type,
         amount,
         price,
         fiat,
