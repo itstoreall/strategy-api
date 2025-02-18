@@ -9,12 +9,14 @@ import {
   Controller,
   ParseIntPipe,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersService } from './orders.service';
 import { LoggerService } from '../logger/logger.service';
+import { Exchange, OrderStatus, OrderType } from '@prisma/client';
 
 @Controller('orders')
 @UseInterceptors(ResponseInterceptor)
@@ -37,6 +39,28 @@ export class OrdersController {
   findAllByUserId(@Param('userId') userId: string, @Ip() ip: string) {
     this.logger.log(`Req for Orders ${userId}\t${ip}`, OrdersController.name);
     return this.ordersService.findAllByUserId(userId);
+  }
+
+  @Get('user/:userId/strategy')
+  findAllByUserIdAndStrategy(
+    @Param('userId') userId: string,
+    @Query('type') type: OrderType,
+    @Query('symbol') symbol: string,
+    @Query('status') status: OrderStatus,
+    @Query('exchange') exchange: Exchange,
+    @Ip() ip: string,
+  ) {
+    this.logger.log(
+      `Req for Orders by User and Strategy\t${ip}`,
+      OrdersController.name,
+    );
+    return this.ordersService.findAllByUserIdAndStrategy(
+      userId,
+      type,
+      symbol,
+      status,
+      exchange,
+    );
   }
 
   /* JSON Content:

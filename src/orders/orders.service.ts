@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Exchange, OrderStatus, OrderType, Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 import { StrategiesService } from '../strategies/strategies.service';
 import { DatabaseService } from '../database/database.service';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import {
   OrderStatusEnum,
   OrderTypeEnum,
@@ -34,6 +34,28 @@ export class OrdersService {
       // if (!userOrders.length) {
       //   throw new BadReq(`No orders found for userId: ${userId}`);
       // }
+
+      return userOrders;
+    } catch (err) {
+      throw new BadReq(err.message);
+    }
+  }
+
+  async findAllByUserIdAndStrategy(
+    userId: string,
+    type: OrderType,
+    symbol: string = '',
+    status: OrderStatus,
+    exchange: Exchange,
+  ) {
+    try {
+      console.log('=>>>>>', userId, type, symbol, status, exchange);
+      const userOrders = await this.db.order.findMany({
+        where: { userId, type, symbol, status, exchange },
+        orderBy: { updatedAt: 'desc' },
+      });
+
+      console.log('userOrders:', userOrders);
 
       return userOrders;
     } catch (err) {
