@@ -34,6 +34,12 @@ export class UserService {
     private readonly generateVerifyCode: GenerateVerifyCode,
   ) {}
 
+  async getAllUsers() {
+    return await this.db.user.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async getUserByEmail(email: string): Promise<UserResDto> {
     const user = await this.db.user.findUnique({ where: { email } });
     if (!user) return null;
