@@ -73,6 +73,14 @@ export class StrategiesService {
     return await this.db.strategy.findUnique({ where: { id } });
   }
 
+  async findByTypeAndSymbol(type: StrategyTypeEnum, symbol: string) {
+    // const _type =
+    //   type === OrderTypeEnum.Buy
+    //     ? StrategyTypeEnum.Bull
+    //     : StrategyTypeEnum.Bear;
+    return await this.db.strategy.findFirst({ where: { type: type, symbol } });
+  }
+
   /* JSON Content:
   { 
     "type": "BULL",
@@ -82,7 +90,7 @@ export class StrategiesService {
   }
   */
   async create(createStrategyDto: CreateStrategyDto) {
-    const { type, symbol, status, userId } = createStrategyDto;
+    const { type, symbol, status, userId } = createStrategyDto; // data is here!
     const symbolUpperCase = symbol.toUpperCase();
     const checkParam = { where: { symbol: symbolUpperCase } };
     const token = await this.db.token.findUnique(checkParam);
@@ -93,7 +101,7 @@ export class StrategiesService {
       where: { type, token: { symbol: symbolUpperCase }, userId },
     });
 
-    console.log('existingStrategy:', existingStrategy);
+    // console.log('existingStrategy:', existingStrategy);
 
     if (existingStrategy) {
       const errorMsg = `strategy ${type} ${symbolUpperCase} already exists`;
@@ -106,9 +114,12 @@ export class StrategiesService {
       status,
       token: { connect: { symbol: symbolUpperCase } },
       userId,
+      /*
+      data, // from the createStrategyDto
+      */
     };
 
-    console.log('newStrategy:', newStrategy);
+    // console.log('newStrategy:', newStrategy);
 
     return await this.db.strategy.create({ data: newStrategy });
   }

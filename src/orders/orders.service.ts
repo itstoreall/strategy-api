@@ -49,13 +49,13 @@ export class OrdersService {
     exchange: Exchange,
   ) {
     try {
-      console.log('=>>>>>', userId, type, symbol, status, exchange);
+      // console.log('=>>>>>', userId, type, symbol, status, exchange);
       const userOrders = await this.db.order.findMany({
         where: { userId, type, symbol, status, exchange },
         orderBy: { updatedAt: 'desc' },
       });
 
-      console.log('userOrders:', userOrders);
+      // console.log('userOrders:', userOrders);
 
       return userOrders;
     } catch (err) {
@@ -89,6 +89,7 @@ export class OrdersService {
         status: StrategyStatusEnum.Active,
         symbol: createOrderDto.symbol,
         userId: createOrderDto.userId,
+        data: { value: 0, is: true },
       });
 
       const newOrder: Prisma.OrderCreateInput = {
@@ -116,6 +117,89 @@ export class OrdersService {
   }
 
   async removeById(id: number) {
-    return await this.db.order.delete({ where: { id } });
+    try {
+      const deletedOrder = await this.db.order.delete({ where: { id } });
+
+      const remainingOrders = await this.db.order.findMany({
+        where: {
+          symbol: deletedOrder.symbol,
+          type: deletedOrder.type,
+          userId: deletedOrder.userId,
+        },
+      });
+
+      if (remainingOrders.length === 0) {
+        const strategyType =
+          deletedOrder.type === OrderTypeEnum.Buy
+            ? StrategyTypeEnum.Bull
+            : StrategyTypeEnum.Bear;
+
+        const strategy = await this.strategiesService.findByTypeAndSymbol(
+          strategyType,
+          deletedOrder.symbol,
+        );
+
+        if (strategy) {
+          await this.strategiesService.deleteById(strategy.id);
+          console.log(`Deleted strategy with ID: ${strategy.id}`);
+        }
+      }
+
+      return deletedOrder;
+    } catch (err) {
+      throw new BadReq(err.message);
+    }
   }
+
+  // async removeById(id: number) {
+  //   try {
+  //     const deletedOrder = await this.db.order.delete({ where: { id } });
+
+  //     const remainingOrders = await this.db.order.findMany({
+  //       where: {
+  //         symbol: deletedOrder.symbol,
+  //         type: deletedOrder.type,
+  //         userId: deletedOrder.userId,
+  //       },
+  //     });
+
+  //     if (deletedOrder.id === id) {
+  //       console.log('res:', deletedOrder.id === id);
+  //       // const strategy = await this.strategiesService.findByTypeAndSymbol(
+  //       //   deletedOrder.type as OrderTypeEnum,
+  //       //   deletedOrder.symbol,
+  //       // );
+
+  //       const strategyType =
+  //         deletedOrder.type === OrderTypeEnum.Buy
+  //           ? StrategyTypeEnum.Bull
+  //           : StrategyTypeEnum.Bear;
+
+  //       const strategy = await this.strategiesService.findByTypeAndSymbol(
+  //         strategyType,
+  //         deletedOrder.symbol,
+  //       );
+
+  //       console.log('strategyType:', strategyType);
+
+  //       if (strategy) {
+  //         await this.strategiesService.deleteById(strategy.id);
+  //         console.log(`Deleted strategy with ID: ${strategy.id}`);
+  //       }
+  //     }
+  //     return deletedOrder;
+
+  //     // if (res.id === id) {
+  //     //   console.log('res:', res.id === id);
+  //     //   const strategy = await this.strategiesService.findByTypeAndSymbol(
+  //     //     res.type as OrderTypeEnum,
+  //     //     res.symbol,
+  //     //   );
+  //     //   console.log('strategy:', strategy);
+  //     // }
+  //     // return res;
+  //   } catch (err) {
+  //     throw new BadReq(err.message);
+  //   }
+  // }
 }
