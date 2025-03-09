@@ -56,7 +56,9 @@ CREATE TABLE "Strategy" (
     "type" "StrategyType" NOT NULL,
     "symbol" TEXT NOT NULL,
     "status" "StrategyStatus" NOT NULL,
+    "target" INTEGER NOT NULL DEFAULT 100,
     "userId" TEXT NOT NULL,
+    "data" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

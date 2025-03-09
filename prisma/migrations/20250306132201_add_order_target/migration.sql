@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Order" ADD COLUMN     "target" INTEGER NOT NULL DEFAULT 100;
