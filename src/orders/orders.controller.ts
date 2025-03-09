@@ -24,11 +24,13 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
   private readonly logger = new LoggerService(OrdersController.name);
 
+  /*
   @Get()
   findAll(@Ip() ip: string) {
     this.logger.log(`Req for ALL Orders\t${ip}`, OrdersController.name);
     return this.ordersService.findAll();
   }
+  */
 
   @Get('id/:id')
   findById(@Param('id', ParseIntPipe) id: string) {

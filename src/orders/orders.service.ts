@@ -18,10 +18,16 @@ export class OrdersService {
     private readonly strategiesService: StrategiesService,
   ) {}
 
+  /*
   async findAll() {
     return await this.db.order.findMany({
       orderBy: { updatedAt: 'desc' },
     });
+  }
+  */
+
+  async findById(id: number) {
+    return await this.db.order.findUnique({ where: { id } });
   }
 
   async findAllByUserId(userId: string) {
@@ -49,22 +55,28 @@ export class OrdersService {
     exchange: Exchange,
   ) {
     try {
-      // console.log('=>>>>>', userId, type, symbol, status, exchange);
       const userOrders = await this.db.order.findMany({
         where: { userId, type, symbol, status, exchange },
         orderBy: { updatedAt: 'desc' },
       });
 
-      // console.log('userOrders:', userOrders);
+      const currentType =
+        type === OrderTypeEnum.Buy
+          ? StrategyTypeEnum.Bull
+          : StrategyTypeEnum.Bear;
 
-      return userOrders;
+      const strategy = await this.strategiesService.findByTypeAndSymbol(
+        currentType,
+        symbol,
+      );
+
+      return userOrders.map((order) => ({
+        ...order,
+        target: strategy.target ?? 100,
+      }));
     } catch (err) {
       throw new BadReq(err.message);
     }
-  }
-
-  async findById(id: number) {
-    return await this.db.order.findUnique({ where: { id } });
   }
 
   async create(createOrderDto: CreateOrderDto) {
@@ -84,12 +96,12 @@ export class OrdersService {
           ? StrategyTypeEnum.Bull
           : StrategyTypeEnum.Bear;
 
-      await this.strategiesService.create({
+      const strategy = await this.strategiesService.create({
         type: strategyType,
         status: StrategyStatusEnum.Active,
         symbol: createOrderDto.symbol,
         userId: createOrderDto.userId,
-        data: { value: 0, is: true },
+        data: { value: 0 },
       });
 
       const newOrder: Prisma.OrderCreateInput = {
@@ -103,7 +115,15 @@ export class OrdersService {
         userId: createOrderDto.userId,
       };
 
-      return await this.db.order.create({ data: newOrder });
+      // const strategy = await this.strategiesService.findByTypeAndSymbol(
+      //   StrategyTypeEnum.Bull,
+      //   createOrderDto.symbol,
+      // );
+
+      // console.log('strategy:', strategy);
+
+      const createdOrder = await this.db.order.create({ data: newOrder });
+      return { ...createdOrder, target: strategy.target };
     } catch (err) {
       throw new BadReq(err.message);
     }
@@ -150,56 +170,4 @@ export class OrdersService {
       throw new BadReq(err.message);
     }
   }
-
-  // async removeById(id: number) {
-  //   try {
-  //     const deletedOrder = await this.db.order.delete({ where: { id } });
-
-  //     const remainingOrders = await this.db.order.findMany({
-  //       where: {
-  //         symbol: deletedOrder.symbol,
-  //         type: deletedOrder.type,
-  //         userId: deletedOrder.userId,
-  //       },
-  //     });
-
-  //     if (deletedOrder.id === id) {
-  //       console.log('res:', deletedOrder.id === id);
-  //       // const strategy = await this.strategiesService.findByTypeAndSymbol(
-  //       //   deletedOrder.type as OrderTypeEnum,
-  //       //   deletedOrder.symbol,
-  //       // );
-
-  //       const strategyType =
-  //         deletedOrder.type === OrderTypeEnum.Buy
-  //           ? StrategyTypeEnum.Bull
-  //           : StrategyTypeEnum.Bear;
-
-  //       const strategy = await this.strategiesService.findByTypeAndSymbol(
-  //         strategyType,
-  //         deletedOrder.symbol,
-  //       );
-
-  //       console.log('strategyType:', strategyType);
-
-  //       if (strategy) {
-  //         await this.strategiesService.deleteById(strategy.id);
-  //         console.log(`Deleted strategy with ID: ${strategy.id}`);
-  //       }
-  //     }
-  //     return deletedOrder;
-
-  //     // if (res.id === id) {
-  //     //   console.log('res:', res.id === id);
-  //     //   const strategy = await this.strategiesService.findByTypeAndSymbol(
-  //     //     res.type as OrderTypeEnum,
-  //     //     res.symbol,
-  //     //   );
-  //     //   console.log('strategy:', strategy);
-  //     // }
-  //     // return res;
-  //   } catch (err) {
-  //     throw new BadReq(err.message);
-  //   }
-  // }
 }

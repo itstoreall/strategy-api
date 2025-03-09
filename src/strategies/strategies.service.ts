@@ -106,7 +106,7 @@ export class StrategiesService {
     if (existingStrategy) {
       const errorMsg = `strategy ${type} ${symbolUpperCase} already exists`;
       console.error(errorMsg);
-      return errorMsg;
+      return existingStrategy;
     }
 
     const newStrategy: Prisma.StrategyCreateInput = {
