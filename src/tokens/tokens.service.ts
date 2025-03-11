@@ -15,7 +15,6 @@ export class TokensService {
 
   async findAll(status?: TokenStatusEnum, orderSymbol?: string) {
     const statusValue = status ? status : TokenStatusEnum.All;
-
     const ordersParam = { some: { symbol: orderSymbol } };
     const param = {
       where:
@@ -46,12 +45,13 @@ export class TokensService {
 
     const createdPair = `${tokenSymbol}USDT`;
     const pairRegex = /^[A-Z]+USDT$/;
-    if (!pairRegex.test(createdPair)) throw new BadReq('Invalid pair format!');
+
+    if (!pairRegex.test(createdPair) && tokenSymbol !== '1INCH')
+      throw new BadReq('Invalid pair format!');
 
     const checkParam = { where: { symbol: tokenSymbol } };
     const token = await this.db.token.findUnique(checkParam);
     if (token) {
-      console.log(1);
       throw new BadReq('Token already exists!');
     }
 
@@ -67,10 +67,8 @@ export class TokensService {
       };
 
       const res = await this.db.token.create({ data: newToken });
-      console.log('res:', res);
       return res;
     } catch (err) {
-      console.log(2);
       throw new BadReq(err.message);
     }
   }
@@ -82,16 +80,27 @@ export class TokensService {
     ]);
 
     if (prices && currentTokens) {
-      for (const token of currentTokens.tokens) {
-        const newPrice = +prices[token.pair];
+      const updates = currentTokens.tokens
+        .map((token) => {
+          const newPrice = +prices[token.pair];
+          if (newPrice) {
+            return {
+              symbol: token.symbol,
+              data: { price: newPrice },
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
 
-        if (newPrice) {
-          await this.db.token.update({
-            where: { symbol: token.symbol },
-            data: { price: newPrice },
-          });
-        }
-      }
+      await Promise.all(
+        updates.map((update) =>
+          this.db.token.update({
+            where: { symbol: update.symbol },
+            data: update.data,
+          }),
+        ),
+      );
     }
 
     return await this.findAll();
@@ -108,6 +117,30 @@ export class TokensService {
     return await this.db.token.delete({ where: { symbol } });
   }
 }
+
+/* remove later!!!
+async updatePrices() {
+  const [prices, currentTokens] = await Promise.all([
+    this.binance.getTokenPriceByPair(),
+    this.findAll(),
+  ]);
+  if (prices && currentTokens) {
+    console.log('2', prices['BTCUSDT'], currentTokens.tokens.length);
+
+    for (const token of currentTokens.tokens) {
+      const newPrice = +prices[token.pair];
+
+      if (newPrice) {
+        await this.db.token.update({
+          where: { symbol: token.symbol },
+          data: { price: newPrice },
+        });
+      }
+    }
+  }
+  return await this.findAll();
+}
+*/
 
 /* before adding Prisma --
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -173,6 +206,8 @@ export class TokensService {
     this.tokens.push(createTokenDto);
     return { data: createTokenDto };
   }
+  
+  
 
   update(symbol: string, updateTokenDto: UpdateTokenDto) {
     this.tokens = this.tokens.map((token) => {
