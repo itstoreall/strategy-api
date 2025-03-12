@@ -154,9 +154,10 @@ export class OrdersService {
             ? StrategyTypeEnum.Bull
             : StrategyTypeEnum.Bear;
 
-        const strategy = await this.strategiesService.findByTypeAndSymbol(
+        const strategy = await this.strategiesService.findByTypeSymbolAndUserId(
           strategyType,
           deletedOrder.symbol,
+          deletedOrder.userId,
         );
 
         if (strategy) {

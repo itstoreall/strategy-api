@@ -78,7 +78,19 @@ export class StrategiesService {
     //   type === OrderTypeEnum.Buy
     //     ? StrategyTypeEnum.Bull
     //     : StrategyTypeEnum.Bear;
-    return await this.db.strategy.findFirst({ where: { type: type, symbol } });
+    return await this.db.strategy.findFirst({
+      where: { type: type, symbol },
+    });
+  }
+
+  async findByTypeSymbolAndUserId(
+    type: StrategyTypeEnum,
+    symbol: string,
+    userId: string,
+  ) {
+    return await this.db.strategy.findFirst({
+      where: { type: type, symbol, userId },
+    });
   }
 
   /* JSON Content:
@@ -101,7 +113,7 @@ export class StrategiesService {
       where: { type, token: { symbol: symbolUpperCase }, userId },
     });
 
-    // console.log('existingStrategy:', existingStrategy);
+    console.log('existingStrategy:', existingStrategy);
 
     if (existingStrategy) {
       const errorMsg = `strategy ${type} ${symbolUpperCase} already exists`;
