@@ -19,9 +19,9 @@ async function bootstrap() {
       process.env.STRATEGY_CLIENT_LOCAL_HTTP_URL,
     ],
     // origin: true,
-    methods: 'HEAD,GET,POST,PUT,PATCH,DELETE', //
+    methods: 'GET,POST,PUT,DELETE', // HEAD,PATCH
     credentials: true,
-    allowedHeaders: 'Content-Type, Authorization',
+    // allowedHeaders: 'Content-Type, Authorization',
   });
 
   app.setGlobalPrefix('api', { exclude: ['/', '/api'] });

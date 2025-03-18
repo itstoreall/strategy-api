@@ -33,10 +33,11 @@ export class OrdersService {
   }
 
   async findAllByUserId(userId: string, sessionToken: string) {
-    const session = await this.sessionsService.findOneByToken(sessionToken);
-    if (!session) {
-      throw new BadReq('ERROR: no session!!!');
-    }
+    console.log('sessionToken:', sessionToken);
+    // const session = await this.sessionsService.findOneByToken(sessionToken);
+    // if (!session) {
+    //   throw new BadReq('ERROR: no session!!!');
+    // }
     try {
       const userOrders = await this.db.order.findMany({
         where: { userId },
