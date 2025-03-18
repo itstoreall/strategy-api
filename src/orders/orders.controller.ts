@@ -9,7 +9,7 @@ import {
   Controller,
   ParseIntPipe,
   UseInterceptors,
-  // Headers,
+  Headers,
   Query,
   // BadRequestException as BadReq,
 } from '@nestjs/common';
@@ -42,10 +42,11 @@ export class OrdersController {
   @Get('user/:userId')
   findAllByUserId(
     @Param('userId') userId: string,
-    // @Headers('authorization') authorization: string,
+    @Headers('X-Session-Token') sessionToken: string,
     @Ip() ip: string,
   ) {
     this.logger.log(`Req for Orders ${userId}\t${ip}`, OrdersController.name);
+    console.log('sessionToken::::', sessionToken);
     // const sessionToken = authorization?.split(' ')[1];
     // if (!sessionToken) {
     //   throw new BadReq('Authorization token is missing or invalid');
