@@ -19,7 +19,7 @@ async function bootstrap() {
       process.env.STRATEGY_CLIENT_LOCAL_HTTP_URL,
     ],
     // origin: true,
-    methods: 'GET,POST,PUT,DELETE', // HEAD,PATCH
+    methods: 'HEAD,GET,POST,PUT,PATCH,DELETE',
     credentials: true,
   });
 
