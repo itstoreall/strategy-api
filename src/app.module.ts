@@ -15,6 +15,7 @@ import { UserModule } from './user/user.module';
 // import { UtilsModule } from './utils/utils.module';
 import { MailerService } from './mailer/mailer.service';
 import { MailerModule } from './mailer/mailer.module';
+import { SessionsModule } from './sessions/sessions.module';
 
 const throttlerShort = {
   name: 'short',
@@ -44,6 +45,7 @@ const ThrottlerProvider = {
     LoggerModule,
     ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),
     ThrottlerModule.forRoot([throttlerShort, throttleLong]),
+    SessionsModule,
   ],
   controllers: [AppController],
   providers: [AppService, ThrottlerProvider, BinanceService, MailerService],

@@ -3,6 +3,7 @@ import { Exchange, OrderStatus, OrderType, Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { StrategiesService } from '../strategies/strategies.service';
+import { SessionsService } from '../sessions/sessions.service';
 import { DatabaseService } from '../database/database.service';
 import {
   OrderStatusEnum,
@@ -16,6 +17,7 @@ export class OrdersService {
   constructor(
     private readonly db: DatabaseService,
     private readonly strategiesService: StrategiesService,
+    private readonly sessionsService: SessionsService,
   ) {}
 
   /*
@@ -30,17 +32,16 @@ export class OrdersService {
     return await this.db.order.findUnique({ where: { id } });
   }
 
-  async findAllByUserId(userId: string) {
+  async findAllByUserId(userId: string, sessionToken: string) {
+    const session = await this.sessionsService.findOneByToken(sessionToken);
+    if (!session) {
+      throw new BadReq('ERROR: no session!!!');
+    }
     try {
       const userOrders = await this.db.order.findMany({
         where: { userId },
         orderBy: { updatedAt: 'desc' },
       });
-
-      // if (!userOrders.length) {
-      //   throw new BadReq(`No orders found for userId: ${userId}`);
-      // }
-
       return userOrders;
     } catch (err) {
       throw new BadReq(err.message);

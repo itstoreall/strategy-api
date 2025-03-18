@@ -9,7 +9,9 @@ import {
   Controller,
   ParseIntPipe,
   UseInterceptors,
+  Headers,
   Query,
+  BadRequestException as BadReq,
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -38,9 +40,17 @@ export class OrdersController {
   }
 
   @Get('user/:userId')
-  findAllByUserId(@Param('userId') userId: string, @Ip() ip: string) {
+  findAllByUserId(
+    @Param('userId') userId: string,
+    @Headers('authorization') authorization: string,
+    @Ip() ip: string,
+  ) {
     this.logger.log(`Req for Orders ${userId}\t${ip}`, OrdersController.name);
-    return this.ordersService.findAllByUserId(userId);
+    const sessionToken = authorization?.split(' ')[1];
+    if (!sessionToken) {
+      throw new BadReq('Authorization token is missing or invalid');
+    }
+    return this.ordersService.findAllByUserId(userId, sessionToken);
   }
 
   @Get('user/:userId/strategy')
