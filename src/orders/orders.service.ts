@@ -40,7 +40,7 @@ export class OrdersService {
     }
     const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
     if (!isEqual) {
-      throw new BadReq('ERROR: sessionTokens are not equal!'); //
+      throw new BadReq('ERROR: sessionTokens are not equal!');
     }
     try {
       const userOrders = await this.db.order.findMany({
