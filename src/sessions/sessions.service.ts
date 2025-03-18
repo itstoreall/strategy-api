@@ -14,7 +14,7 @@ import { DatabaseService } from '../database/database.service'; // Ensure this p
 export class SessionsService {
   constructor(private readonly db: DatabaseService) {}
 
-  async findOne(userId: string) {
+  async findByUserId(userId: string) {
     try {
       const session = await this.db.session.findFirst({
         where: { userId },
@@ -30,7 +30,7 @@ export class SessionsService {
     }
   }
 
-  async findOneByToken(sessionToken: string) {
+  async findByToken(sessionToken: string) {
     try {
       const session = await this.db.session.findFirst({
         where: { sessionToken },

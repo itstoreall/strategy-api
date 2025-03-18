@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
 import { Exchange, OrderStatus, OrderType, Prisma } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { StrategiesService } from '../strategies/strategies.service';
@@ -33,11 +34,14 @@ export class OrdersService {
   }
 
   async findAllByUserId(userId: string, sessionToken: string) {
-    console.log('sessionToken:', sessionToken);
-    // const session = await this.sessionsService.findOneByToken(sessionToken);
-    // if (!session) {
-    //   throw new BadReq('ERROR: no session!!!');
-    // }
+    const session = await this.sessionsService.findByUserId(userId);
+    if (!session) {
+      throw new BadReq('ERROR: no session!');
+    }
+    const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
+    if (!isEqual) {
+      throw new BadReq('ERROR: sessionTokens are not equal!');
+    }
     try {
       const userOrders = await this.db.order.findMany({
         where: { userId },
