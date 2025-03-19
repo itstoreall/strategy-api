@@ -42,7 +42,7 @@ export class OrdersController {
   @Get('user/:userId')
   findAllByUserId(
     @Param('userId') userId: string,
-    @Query('sessionToken') sessionToken: OrderType,
+    @Query('sessionToken') sessionToken: string,
     @Ip() ip: string,
   ) {
     this.logger.log(`Req for Orders ${userId}\t${ip}`, OrdersController.name);
