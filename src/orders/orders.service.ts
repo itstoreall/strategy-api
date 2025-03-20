@@ -11,6 +11,7 @@ import {
   OrderTypeEnum,
   StrategyStatusEnum,
   StrategyTypeEnum,
+  AuthRoleEnum,
 } from '../enum';
 
 @Injectable()
@@ -34,14 +35,27 @@ export class OrdersService {
   }
 
   async findAllByUserId(userId: string, sessionToken: string) {
+    /*
+    console.log('userId:::', userId);
+    console.log('sessionToken:::', sessionToken);
+    */
     const session = await this.sessionsService.findByUserId(userId);
     if (!session) {
       throw new BadReq('ERROR: no session!');
     }
+
     const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
     if (!isEqual) {
-      throw new BadReq('ERROR: sessionTokens are not equal!');
+      const admin = await this.db.user.findFirst({
+        where: { role: AuthRoleEnum.Admin },
+      });
+      if (!admin) throw new BadReq('ERROR: user is not an Admin!');
+      const session = await this.sessionsService.findByUserId(admin.id);
+      if (!session) throw new BadReq('ERROR: no Admin session!');
+      const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
+      if (!isEqual) throw new BadReq('ERROR: failed Admin sessionTokens!');
     }
+
     try {
       const userOrders = await this.db.order.findMany({
         where: { userId },

@@ -14,6 +14,14 @@ import { DatabaseService } from '../database/database.service'; // Ensure this p
 export class SessionsService {
   constructor(private readonly db: DatabaseService) {}
 
+  async getAllSessions() {
+    try {
+      return await this.db.session.findMany();
+    } catch (err) {
+      throw new NotFoundException(err.message);
+    }
+  }
+
   async findByUserId(userId: string) {
     try {
       const session = await this.db.session.findFirst({
