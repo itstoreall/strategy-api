@@ -1,24 +1,35 @@
-// import { Injectable } from '@nestjs/common';
-
-// @Injectable()
-// export class SessionsService {
-//   findOne(userId: string) {
-//     return `This action returns a #${userId} session`;
-//   }
-// }
-
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service'; // Ensure this path matches your project structure.
+import {
+  Injectable,
+  NotFoundException as NotFound,
+  BadRequestException as BadReq,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { DatabaseService } from '../database/database.service';
+import { AuthRoleEnum } from 'src/enum';
 
 @Injectable()
 export class SessionsService {
   constructor(private readonly db: DatabaseService) {}
 
-  async getAllSessions() {
-    try {
-      return await this.db.session.findMany();
-    } catch (err) {
-      throw new NotFoundException(err.message);
+  async getAllSessions(userId: string, sessionToken: string) {
+    const session = await this.findByUserId(userId);
+    if (!session) {
+      throw new BadReq('ERROR: no session!');
+    }
+
+    const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
+    if (isEqual) {
+      const admin = await this.db.user.findFirst({
+        where: { role: AuthRoleEnum.Admin },
+      });
+      if (!admin) throw new BadReq('ERROR: user is not an Admin!');
+      try {
+        return await this.db.session.findMany({
+          select: { userId: true, updatedAt: true },
+        });
+      } catch (err) {
+        throw new NotFound(err.message);
+      }
     }
   }
 
@@ -29,12 +40,12 @@ export class SessionsService {
       });
 
       if (!session) {
-        throw new NotFoundException(`Session not found for userId: ${userId}`);
+        throw new NotFound(`Session not found for userId: ${userId}`);
       }
 
       return session;
     } catch (err) {
-      throw new NotFoundException(err.message);
+      throw new NotFound(err.message);
     }
   }
 
@@ -45,14 +56,14 @@ export class SessionsService {
       });
 
       if (!session) {
-        throw new NotFoundException(
+        throw new NotFound(
           `Session not found for sessionToken: ${sessionToken}`,
         );
       }
 
       return session;
     } catch (err) {
-      throw new NotFoundException(err.message);
+      throw new NotFound(err.message);
     }
   }
 }

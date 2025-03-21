@@ -9,9 +9,7 @@ import {
   Controller,
   ParseIntPipe,
   UseInterceptors,
-  // Headers,
   Query,
-  // BadRequestException as BadReq,
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateOrderDto } from './dto/create-order.dto';
