@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { DatabaseService } from '../database/database.service';
-import { AuthRoleEnum } from 'src/enum';
+import { AuthRoleEnum } from '../enum';
 
 @Injectable()
 export class SessionsService {
@@ -18,6 +18,7 @@ export class SessionsService {
     }
 
     const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
+
     if (isEqual) {
       const admin = await this.db.user.findFirst({
         where: { role: AuthRoleEnum.Admin },

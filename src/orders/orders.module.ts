@@ -3,8 +3,8 @@ import { DatabaseModule } from '../database/database.module';
 import { OrdersController } from './orders.controller';
 import { BinanceService } from '../binance/binance.service';
 import { OrdersService } from './orders.service';
-import { StrategiesModule } from 'src/strategies/strategies.module';
-import { SessionsModule } from 'src/sessions/sessions.module';
+import { StrategiesModule } from '../strategies/strategies.module';
+import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
   imports: [DatabaseModule, StrategiesModule, SessionsModule],
