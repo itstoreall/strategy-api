@@ -1,12 +1,12 @@
-import { Controller, Get, Ip, Query } from '@nestjs/common';
-import { SessionsService } from './sessions.service';
-import { LoggerService } from '../logger/logger.service';
+import { Controller } from '@nestjs/common';
+// import { SessionsService } from './sessions.service';
+// import { LoggerService } from '../logger/logger.service';
 
 @Controller('sessions')
 export class SessionsController {
-  constructor(private readonly sessionsService: SessionsService) {}
-  private readonly logger = new LoggerService(SessionsController.name);
-
+  // constructor(private readonly sessionsService: SessionsService) {}
+  // private readonly logger = new LoggerService(SessionsController.name);
+  /*
   @Get('/all')
   getAllSessions(
     @Query('userId') userId: string,
@@ -19,7 +19,7 @@ export class SessionsController {
     );
     return this.sessionsService.getAllSessions(userId, sessionToken);
   }
-
+  */
   /*
   @Get(':id')
   findOne(

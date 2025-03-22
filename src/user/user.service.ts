@@ -47,6 +47,20 @@ export class UserService {
       throw new BadReq('ERROR: sessionTokens are not equal!');
     }
     const users = await this.db.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        sessions: {
+          select: {
+            updatedAt: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
     const isAdmin = users.find((user) => user.role === AuthRoleEnum.Admin);
@@ -55,6 +69,18 @@ export class UserService {
     }
     return users;
   }
+
+  /*
+  id: string;
+  email: string;
+  emailVerified: Date;
+  image: string | null;
+  name: string;
+  password: string;
+  role: AuthRoleEnum;
+  createdAt: Date;
+  updatedAt: Date;
+  */
 
   async getUserByEmail(email: string): Promise<UserResDto> {
     const user = await this.db.user.findUnique({ where: { email } });

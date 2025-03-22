@@ -1,16 +1,11 @@
-import {
-  Injectable,
-  NotFoundException as NotFound,
-  BadRequestException as BadReq,
-} from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { Injectable, NotFoundException as NotFound } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { AuthRoleEnum } from '../enum';
 
 @Injectable()
 export class SessionsService {
   constructor(private readonly db: DatabaseService) {}
 
+  /*
   async getAllSessions(userId: string, sessionToken: string) {
     const session = await this.findByUserId(userId);
     if (!session) {
@@ -33,6 +28,7 @@ export class SessionsService {
       }
     }
   }
+  */
 
   async findByUserId(userId: string) {
     try {
@@ -50,6 +46,7 @@ export class SessionsService {
     }
   }
 
+  /*
   async findByToken(sessionToken: string) {
     try {
       const session = await this.db.session.findFirst({
@@ -67,4 +64,5 @@ export class SessionsService {
       throw new NotFound(err.message);
     }
   }
+  */
 }
