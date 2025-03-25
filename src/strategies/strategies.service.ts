@@ -73,6 +73,10 @@ export class StrategiesService {
     return await this.db.strategy.findUnique({ where: { id } });
   }
 
+  async findBySymbol(symbol: string) {
+    return await this.db.strategy.findFirst({ where: { symbol } });
+  }
+
   async findByTypeAndSymbol(type: StrategyTypeEnum, symbol: string) {
     // const _type =
     //   type === OrderTypeEnum.Buy

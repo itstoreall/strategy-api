@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { CreateTokenDto } from './dto/create-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
 import { TokenStatusEnum } from '../enum';
+import { StrategiesService } from '../strategies/strategies.service';
 import { DatabaseService } from '../database/database.service';
 import { BinanceService } from '../binance/binance.service';
 
@@ -11,6 +12,7 @@ export class TokensService {
   constructor(
     private readonly db: DatabaseService,
     private readonly binance: BinanceService,
+    private readonly strategiesService: StrategiesService,
   ) {}
 
   async findAll(status?: TokenStatusEnum, orderSymbol?: string) {
@@ -114,6 +116,10 @@ export class TokensService {
   }
 
   async deleteBySymbol(symbol: string) {
+    const strategy = await this.strategiesService.findBySymbol(symbol);
+    if (!!strategy) {
+      throw new BadReq('There is a Strategy used by!');
+    }
     return await this.db.token.delete({ where: { symbol } });
   }
 }
