@@ -111,10 +111,11 @@ export class OrdersService {
         throw new BadReq('UserId do not match');
       }
 
-      const strategyType =
-        createOrderDto.type === OrderTypeEnum.Buy
-          ? StrategyTypeEnum.Bull
-          : StrategyTypeEnum.Bear;
+      const isBullStrategy = createOrderDto.type === OrderTypeEnum.Buy;
+
+      const strategyType = isBullStrategy
+        ? StrategyTypeEnum.Bull
+        : StrategyTypeEnum.Bear;
 
       const strategy = await this.strategiesService.create({
         type: strategyType,
@@ -126,9 +127,9 @@ export class OrdersService {
 
       const newOrder: Prisma.OrderCreateInput = {
         type: createOrderDto.type,
-        amount,
+        amount: isBullStrategy ? amount : 0,
         price,
-        fiat,
+        fiat: isBullStrategy ? fiat : 0,
         status: OrderStatusEnum.Active,
         token: { connect: { symbol: createOrderDto.symbol } },
         exchange,
