@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
 import { Exchange, OrderStatus, OrderType, Prisma } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+// import * as bcrypt from 'bcrypt';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { StrategiesService } from '../strategies/strategies.service';
@@ -11,7 +11,7 @@ import {
   OrderTypeEnum,
   StrategyStatusEnum,
   StrategyTypeEnum,
-  AuthRoleEnum,
+  // AuthRoleEnum,
 } from '../enum';
 
 @Injectable()
@@ -34,16 +34,17 @@ export class OrdersService {
     return await this.db.order.findUnique({ where: { id } });
   }
 
-  async findAllByUserId(userId: string, sessionToken: string) {
+  // async findAllByUserId(userId: string, sessionToken: string) {
+  async findAllByUserId(userId: string) {
     /*
     console.log('userId:::', userId);
     console.log('sessionToken:::', sessionToken);
     */
+    /*
     const session = await this.sessionsService.findByUserId(userId);
     if (!session) {
       throw new BadReq('ERROR: no session!');
     }
-
     const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
     if (!isEqual) {
       const admin = await this.db.user.findFirst({
@@ -55,6 +56,7 @@ export class OrdersService {
       const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
       if (!isEqual) throw new BadReq('ERROR: failed Admin sessionTokens!');
     }
+    */
 
     try {
       const userOrders = await this.db.order.findMany({
