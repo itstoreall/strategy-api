@@ -47,12 +47,6 @@ export class OrdersController {
     return this.ordersService.findAllByUserId(userId, sessionToken);
   }
 
-  // @Get('user/:userId')
-  // findAllByUserId(@Param('userId') userId: string, @Ip() ip: string) {
-  //   this.logger.log(`Req for Orders ${userId}\t${ip}`, OrdersController.name);
-  //   return this.ordersService.findAllByUserId(userId);
-  // }
-
   @Get('user/:userId/strategy')
   findAllByUserIdAndStrategy(
     @Param('userId') userId: string,

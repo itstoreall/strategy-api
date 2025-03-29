@@ -35,7 +35,6 @@ export class OrdersService {
   }
 
   async findAllByUserId(userId: string, sessionToken: string) {
-    // async findAllByUserId(userId: string) {
     /*
     console.log('userId:::', userId);
     console.log('sessionToken:::', sessionToken);
@@ -45,6 +44,7 @@ export class OrdersService {
     if (!session) {
       throw new BadReq('ERROR: no session!');
     }
+
     const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
     if (!isEqual) {
       const admin = await this.db.user.findFirst({
@@ -56,7 +56,6 @@ export class OrdersService {
       const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
       if (!isEqual) throw new BadReq('ERROR: failed Admin sessionTokens!');
     }
-    // */
 
     try {
       const userOrders = await this.db.order.findMany({
@@ -137,13 +136,6 @@ export class OrdersService {
         exchange,
         userId: createOrderDto.userId,
       };
-
-      // const strategy = await this.strategiesService.findByTypeAndSymbol(
-      //   StrategyTypeEnum.Bull,
-      //   createOrderDto.symbol,
-      // );
-
-      // console.log('strategy:', strategy);
 
       const createdOrder = await this.db.order.create({ data: newOrder });
       return { ...createdOrder, target: strategy.target };

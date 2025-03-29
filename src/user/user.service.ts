@@ -69,7 +69,6 @@ export class UserService {
     if (!isAdmin) {
       throw new BadReq('ERROR: the user is not an Admin!');
     }
-
     return users;
   }
 
