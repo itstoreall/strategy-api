@@ -6,7 +6,7 @@ import {
   Param,
   Body,
   Controller,
-  Query,
+  // Query,
 } from '@nestjs/common';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { CreateVerifyCodeDto } from './dto/create-verify-code.dto';
@@ -20,12 +20,18 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/all')
+  getAllUsers() {
+    return this.userService.getAllUsers();
+  }
+
+  /*
   getAllUsers(
     @Query('userId') userId: string,
     @Query('sessionToken') sessionToken: string,
   ) {
     return this.userService.getAllUsers(userId, sessionToken);
   }
+  */
 
   @Get('role/:userId')
   getUserRole(@Param('userId') userId: string) {

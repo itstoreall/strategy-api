@@ -21,7 +21,7 @@ import { UserResDto } from './dto/user-res.dto';
 import { DatabaseService } from '../database/database.service';
 import { SessionsService } from '../sessions/sessions.service';
 import { MailerService } from '../mailer/mailer.service';
-import { AuthRoleEnum } from '../enum';
+// import { AuthRoleEnum } from '../enum';
 
 type TrimString = (address: string, start: number, end: number) => string;
 type GenerateVerifyCode = () => string;
@@ -37,7 +37,9 @@ export class UserService {
     private readonly generateVerifyCode: GenerateVerifyCode,
   ) {}
 
-  async getAllUsers(userId: string, sessionToken: string) {
+  // async getAllUsers(userId: string, sessionToken: string) {
+  async getAllUsers() {
+    /*
     const session = await this.sessionsService.findByUserId(userId);
     if (!session) {
       throw new BadReq('ERROR: no session!');
@@ -46,6 +48,7 @@ export class UserService {
     if (!isEqual) {
       throw new BadReq('ERROR: sessionTokens are not equal!');
     }
+    */
     const users = await this.db.user.findMany({
       select: {
         id: true,
@@ -63,10 +66,12 @@ export class UserService {
       },
       orderBy: { createdAt: 'desc' },
     });
+    /*
     const isAdmin = users.find((user) => user.role === AuthRoleEnum.Admin);
     if (!isAdmin) {
       throw new BadReq('ERROR: the user is not an Admin!');
     }
+    */
     return users;
   }
 
