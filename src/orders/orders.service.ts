@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException as BadReq } from '@nestjs/common';
 import { Exchange, OrderStatus, OrderType, Prisma } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+// import * as bcrypt from 'bcrypt';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { StrategiesService } from '../strategies/strategies.service';
@@ -11,7 +11,7 @@ import {
   OrderTypeEnum,
   StrategyStatusEnum,
   StrategyTypeEnum,
-  AuthRoleEnum,
+  // AuthRoleEnum,
 } from '../enum';
 
 @Injectable()
@@ -40,6 +40,7 @@ export class OrdersService {
     console.log('sessionToken:::', sessionToken);
     */
 
+    /*
     const session = await this.sessionsService.findByUserId(userId);
     if (!session) {
       throw new BadReq('ERROR: no session!');
@@ -55,6 +56,11 @@ export class OrdersService {
       if (!session) throw new BadReq('ERROR: no Admin session!');
       const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
       if (!isEqual) throw new BadReq('ERROR: failed Admin sessionTokens!');
+    }
+    */
+
+    if (!sessionToken) {
+      throw new BadReq('No sessionToken!');
     }
 
     try {
