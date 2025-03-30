@@ -20,11 +20,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/all')
-  getAllUsers(
-    @Query('userId') userId: string,
-    @Query('sessionToken') sessionToken: string,
-  ) {
-    return this.userService.getAllUsers(userId, sessionToken);
+  getAllUsers(@Query('userId') userId: string) {
+    return this.userService.getAllUsers(userId);
   }
 
   @Get('role/:userId')

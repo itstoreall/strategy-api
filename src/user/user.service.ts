@@ -19,9 +19,9 @@ import { SignUpResDto } from './dto/sign-up-res.dto';
 import { SignInResDto } from './dto/sign-in-res.dto';
 import { UserResDto } from './dto/user-res.dto';
 import { DatabaseService } from '../database/database.service';
-import { SessionsService } from '../sessions/sessions.service';
+// import { SessionsService } from '../sessions/sessions.service';
 import { MailerService } from '../mailer/mailer.service';
-import { AuthRoleEnum } from '../enum';
+// import { AuthRoleEnum } from '../enum';
 
 type TrimString = (address: string, start: number, end: number) => string;
 type GenerateVerifyCode = () => string;
@@ -31,13 +31,14 @@ export class UserService {
   constructor(
     private readonly db: DatabaseService,
     private readonly mailer: MailerService,
-    private readonly sessionsService: SessionsService,
+    // private readonly sessionsService: SessionsService,
     @Inject('TRIM_STRING') private readonly trimString: TrimString,
     @Inject('GENERATE_VERIFY_CODE')
     private readonly generateVerifyCode: GenerateVerifyCode,
   ) {}
 
-  async getAllUsers(userId: string, sessionToken: string) {
+  async getAllUsers(userId: string) {
+    /*
     const session = await this.sessionsService.findByUserId(userId);
     if (!session) {
       throw new BadReq('ERROR: no session!');
@@ -45,6 +46,17 @@ export class UserService {
     const isEqual = await bcrypt.compare(session.sessionToken, sessionToken);
     if (!isEqual) {
       throw new BadReq('ERROR: sessionTokens are not equal!');
+    }
+    */
+
+    const userEmail = (
+      await this.db.user.findUnique({
+        where: { id: userId },
+      })
+    ).email;
+
+    if (!process.env.ACCESS_CREDENTIALS.split('_|_').includes(userEmail)) {
+      throw new BadReq('userId is not correct!');
     }
 
     const users = await this.db.user.findMany({
@@ -65,10 +77,12 @@ export class UserService {
       orderBy: { createdAt: 'desc' },
     });
 
+    /*
     const isAdmin = users.find((user) => user.role === AuthRoleEnum.Admin);
     if (!isAdmin) {
       throw new BadReq('ERROR: the user is not an Admin!');
     }
+    */
     return users;
   }
 
