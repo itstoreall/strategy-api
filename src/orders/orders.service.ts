@@ -99,7 +99,11 @@ export class OrdersService {
 
       return userOrders.map((order) => ({
         ...order,
-        target: strategy.target ?? 100,
+        // target: strategy.target ?? 100,
+        strategy: {
+          target: strategy.target ?? 100,
+          data: strategy.data,
+        },
       }));
     } catch (err) {
       throw new BadReq(err.message);

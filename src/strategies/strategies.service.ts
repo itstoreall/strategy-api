@@ -106,7 +106,7 @@ export class StrategiesService {
   }
   */
   async create(createStrategyDto: CreateStrategyDto) {
-    const { type, symbol, status, userId } = createStrategyDto; // data is here!
+    const { type, symbol, status, userId, data } = createStrategyDto; // data is here!
     const symbolUpperCase = symbol.toUpperCase();
     const checkParam = { where: { symbol: symbolUpperCase } };
     const token = await this.db.token.findUnique(checkParam);
@@ -117,7 +117,7 @@ export class StrategiesService {
       where: { type, token: { symbol: symbolUpperCase }, userId },
     });
 
-    console.log('existingStrategy:', existingStrategy);
+    // console.log('existingStrategy:', existingStrategy);
 
     if (existingStrategy) {
       const errorMsg = `strategy ${type} ${symbolUpperCase} already exists`;
@@ -130,9 +130,7 @@ export class StrategiesService {
       status,
       token: { connect: { symbol: symbolUpperCase } },
       userId,
-      /*
-      data, // from the createStrategyDto
-      */
+      data,
     };
 
     // console.log('newStrategy:', newStrategy);
@@ -150,8 +148,4 @@ export class StrategiesService {
   async deleteById(id: number) {
     return await this.db.strategy.delete({ where: { id } });
   }
-
-  /*
-
-  */
 }
