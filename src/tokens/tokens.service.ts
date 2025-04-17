@@ -76,11 +76,8 @@ export class TokensService {
   }
 
   async updatePrices() {
-    const [prices, currentTokens] = await Promise.all([
-      this.binance.getTokenPriceByPair(),
-      this.findAll(),
-    ]);
-
+    const prices = await this.binance.getTokenPriceByPair();
+    const currentTokens = await this.findAll();
     if (prices && currentTokens) {
       const updates = currentTokens.tokens
         .map((token) => {
@@ -103,6 +100,12 @@ export class TokensService {
           }),
         ),
       );
+    } else {
+      console.error(
+        'Error: fetching Binance prices! BTC price:',
+        prices['BTCUSDT'],
+      );
+      return currentTokens;
     }
 
     return await this.findAll();
