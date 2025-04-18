@@ -13,9 +13,14 @@ export class BinanceService {
   }
 
   async getTokenPriceByPair(pair?: string): Promise<PriceRes> {
-    const param = pair ? { symbol: pair } : null;
-    const price = await this.client.prices(param);
-    // console.log('price:', price);
-    return price;
+    try {
+      const param = pair ? { symbol: pair } : null;
+      const price = await this.client.prices(param);
+      // console.log('prices:', price);
+      return price;
+    } catch (err) {
+      console.error('ERROR in getTokenPriceByPair:', err);
+      return null;
+    }
   }
 }
