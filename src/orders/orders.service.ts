@@ -140,7 +140,7 @@ export class OrdersService {
         type: createOrderDto.type,
         amount: isBullStrategy ? amount : 0,
         price,
-        fiat: isBullStrategy ? fiat : 0,
+        fiat: isBullStrategy ? +fiat.toFixed(0) : 0,
         status: OrderStatusEnum.Active,
         token: { connect: { symbol: createOrderDto.symbol } },
         exchange,
