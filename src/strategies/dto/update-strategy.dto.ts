@@ -1,9 +1,7 @@
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { StrategyStatusEnum } from '../../enum';
+import { IsObject, IsOptional } from 'class-validator';
 
 export class UpdateStrategyDto {
-  @IsEnum(StrategyStatusEnum, { message: 'valid status required!' })
+  @IsObject({ message: 'valid data JSON required!' })
   @IsOptional()
-  @IsNotEmpty()
-  status?: StrategyStatusEnum;
+  data: Record<string, any>;
 }
