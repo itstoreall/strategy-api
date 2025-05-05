@@ -101,10 +101,7 @@ export class TokensService {
         ),
       );
     } else {
-      console.error(
-        'Error: fetching Binance prices! BTC price:',
-        prices['BTCUSDT'],
-      );
+      console.error('Error: fetching Binance prices!');
       return currentTokens;
     }
 
