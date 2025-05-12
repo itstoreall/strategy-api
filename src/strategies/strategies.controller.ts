@@ -48,6 +48,7 @@ export class StrategiesController {
     @Param('id', ParseIntPipe) id: string,
     @Body() strategyData: string,
   ) {
+    // console.log('strategyData:', strategyData);
     return this.strategiesService.updateStrategyById(+id, strategyData);
   }
 

@@ -92,9 +92,10 @@ export class OrdersService {
           ? StrategyTypeEnum.Bull
           : StrategyTypeEnum.Bear;
 
-      const strategy = await this.strategiesService.findByTypeAndSymbol(
+      const strategy = await this.strategiesService.findByTypeSymbolAndUserId(
         currentType,
         symbol,
+        userId,
       );
 
       return { orders: userOrders, strategy };
