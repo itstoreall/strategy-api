@@ -121,12 +121,14 @@ export class OrdersService {
         ? StrategyTypeEnum.Bull
         : StrategyTypeEnum.Bear;
 
+      // const data = JSON.stringify({});
+
       const strategy = await this.strategiesService.create({
         type: strategyType,
         status: StrategyStatusEnum.Active,
         symbol: createOrderDto.symbol,
         userId: createOrderDto.userId,
-        data: { value: 0 },
+        data: null,
       });
 
       const newOrder: Prisma.OrderCreateInput = {

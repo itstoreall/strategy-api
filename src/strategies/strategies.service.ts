@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
 import { StrategyTypeEnum } from '../enum';
 import { DatabaseService } from '../database/database.service';
-import { UpdateStrategyDto } from './dto/update-strategy.dto';
+// import { UpdateStrategyDto } from './dto/update-strategy.dto';
 // import { UpdateStrategyDto } from './dto/update-strategy.dto';
 
 @Injectable()
@@ -138,10 +138,10 @@ export class StrategiesService {
     return await this.db.strategy.create({ data: newStrategy });
   }
 
-  async updateStrategyById(id: number, updateStrategyDto: UpdateStrategyDto) {
+  async updateStrategyById(id: number, strategyData: string) {
     return await this.db.strategy.update({
       where: { id },
-      data: updateStrategyDto as Prisma.StrategyUpdateInput,
+      data: strategyData as Prisma.StrategyUpdateInput,
     });
   }
 

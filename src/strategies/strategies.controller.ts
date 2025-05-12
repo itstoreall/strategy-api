@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
-import { UpdateStrategyDto } from './dto/update-strategy.dto';
 import { StrategyTypeEnum } from '../enum';
 import { StrategiesService } from './strategies.service';
 import { LoggerService } from '../logger/logger.service';
@@ -47,9 +46,9 @@ export class StrategiesController {
   @Put('id/:id')
   updateById(
     @Param('id', ParseIntPipe) id: string,
-    @Body() updateStrategyDto: UpdateStrategyDto,
+    @Body() strategyData: string,
   ) {
-    return this.strategiesService.updateStrategyById(+id, updateStrategyDto);
+    return this.strategiesService.updateStrategyById(+id, strategyData);
   }
 
   @Delete('id/:id')

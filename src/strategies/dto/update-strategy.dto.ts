@@ -1,4 +1,4 @@
-import { IsObject, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export type TradeStrategy = {
   symbol: string;
@@ -12,7 +12,7 @@ export type TradeStrategy = {
 };
 
 export class UpdateStrategyDto {
-  @IsObject({ message: 'TradeStrategy data is required!' })
-  @IsOptional()
-  data: TradeStrategy;
+  @IsString({ message: 'valid data required!' })
+  @IsNotEmpty()
+  data?: string;
 }
