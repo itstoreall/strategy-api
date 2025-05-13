@@ -13,12 +13,12 @@ async function bootstrap() {
   app.useGlobalFilters(new ExceptionsFilter(httpAdapter));
 
   app.enableCors({
-    // origin: [
-    //   process.env.STRATEGY_CLIENT_BASE_URL,
-    //   process.env.STRATEGY_CLIENT_LOCAL_HTTPS_URL,
-    //   process.env.STRATEGY_CLIENT_LOCAL_HTTP_URL,
-    // ],
-    origin: true,
+    origin: [
+      process.env.STRATEGY_CLIENT_BASE_URL,
+      process.env.STRATEGY_CLIENT_LOCAL_HTTPS_URL,
+      process.env.STRATEGY_CLIENT_LOCAL_HTTP_URL,
+    ],
+    // origin: true,
     methods: 'GET,POST,PUT,DELETE', // HEAD,PATCH
     credentials: true,
     // allowedHeaders: 'Content-Type, Authorization',
