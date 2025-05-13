@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 // export type TradeStrategy = {
 //   symbol: string;
@@ -12,9 +12,9 @@ import { IsNotEmpty, IsString } from 'class-validator';
 // };
 
 export class UpdateStrategyDto {
-  // @IsString({ message: 'User ID must be a string!' })
-  // @IsNotEmpty()
-  // userId: string;
+  @IsNumber({}, { message: 'valid strategyId required!' })
+  @IsNotEmpty()
+  strategyId: number;
 
   @IsString({ message: 'Amount must be a string!' })
   @IsNotEmpty()

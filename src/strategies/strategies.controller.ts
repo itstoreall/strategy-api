@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
+import { UpdateStrategyDto } from './dto/update-strategy.dto';
 import { StrategyTypeEnum } from '../enum';
 import { StrategiesService } from './strategies.service';
 import { LoggerService } from '../logger/logger.service';
@@ -43,13 +44,23 @@ export class StrategiesController {
     return this.strategiesService.create(createStrategyDto);
   }
 
-  @Put('id/:id')
-  updateById(
-    @Param('id', ParseIntPipe) id: string,
-    @Body() strategyData: string,
-  ) {
-    // console.log('strategyData:', strategyData);
-    return strategyData ? this.strategiesService.updateStrategyById(+id) : null;
+  // @Put('id/:id')
+  // updateById(
+  //   @Param('id', ParseIntPipe) id: string,
+  //   @Body() strategyData: string,
+  // ) {
+  //   // console.log('strategyData:', strategyData);
+  //   return strategyData ? this.strategiesService.updateStrategyById(+id) : null;
+  // }
+
+  @Put('update-strategy-data')
+  updateById(@Body() body: UpdateStrategyDto) {
+    console.log('body:', body);
+    // return this.userService.updateName(body.strategyId, body.name);
+    return this.strategiesService.updateStrategyById(
+      body.strategyId,
+      body.amount,
+    );
   }
 
   @Delete('id/:id')
