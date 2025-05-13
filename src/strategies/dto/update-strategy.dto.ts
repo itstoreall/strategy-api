@@ -12,7 +12,11 @@ import { IsNotEmpty, IsString } from 'class-validator';
 // };
 
 export class UpdateStrategyDto {
-  @IsString({ message: 'valid data required!' })
+  // @IsString({ message: 'User ID must be a string!' })
+  // @IsNotEmpty()
+  // userId: string;
+
+  @IsString({ message: 'Amount must be a string!' })
   @IsNotEmpty()
-  data: string;
+  amount: string;
 }

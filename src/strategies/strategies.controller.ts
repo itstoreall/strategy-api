@@ -49,7 +49,7 @@ export class StrategiesController {
     @Body() strategyData: string,
   ) {
     // console.log('strategyData:', strategyData);
-    return this.strategiesService.updateStrategyById(+id, strategyData);
+    return strategyData ? this.strategiesService.updateStrategyById(+id) : null;
   }
 
   @Delete('id/:id')

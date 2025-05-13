@@ -138,10 +138,15 @@ export class StrategiesService {
     return await this.db.strategy.create({ data: newStrategy });
   }
 
-  async updateStrategyById(id: number, strategyData: string) {
+  async updateStrategyById(id: number) {
+    // console.log('strategyData:', strategyData);
+    const date = Date.now();
     return await this.db.strategy.update({
       where: { id },
-      data: strategyData as Prisma.StrategyUpdateInput,
+      data: {
+        data: date,
+      } as Prisma.StrategyUpdateInput,
+      // data: strategyData as Prisma.StrategyUpdateInput,
     });
   }
 
