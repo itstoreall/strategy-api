@@ -13,10 +13,10 @@ import {
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
-import { UpdateStrategyDto } from './dto/update-strategy.dto';
 import { StrategyTypeEnum } from '../enum';
 import { StrategiesService } from './strategies.service';
 import { LoggerService } from '../logger/logger.service';
+import { UpdateStrategyDto } from './dto/update-strategy.dto';
 
 @Controller('strategies')
 @UseInterceptors(ResponseInterceptor)
@@ -44,6 +44,14 @@ export class StrategiesController {
     return this.strategiesService.create(createStrategyDto);
   }
 
+  @Put('update-strategy-data')
+  updateById(
+    // @Param('id', ParseIntPipe) id: string,
+    @Body() body: UpdateStrategyDto,
+  ) {
+    return this.strategiesService.updateStrategyById(body);
+  }
+
   // @Put('id/:id')
   // updateById(
   //   @Param('id', ParseIntPipe) id: string,
@@ -53,15 +61,12 @@ export class StrategiesController {
   //   return strategyData ? this.strategiesService.updateStrategyById(+id) : null;
   // }
 
-  @Put('update-strategy-data')
-  updateById(@Body() body: UpdateStrategyDto) {
-    console.log('body:', body);
-    // return this.userService.updateName(body.strategyId, body.name);
-    return this.strategiesService.updateStrategyById(
-      body.strategyId,
-      body.amount,
-    );
-  }
+  // @Put('update-strategy-data')
+  // updateById(@Body() body: UpdateStrategyDto) {
+  //   console.log('body:', body);
+  //   // return this.userService.updateName(body.strategyId, body.name);
+  //   return this.strategiesService.updateStrategyById(body.strategyId, body);
+  // }
 
   @Delete('id/:id')
   deleteById(@Param('id') id: string) {

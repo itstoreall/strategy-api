@@ -118,19 +118,20 @@ export class OrdersService {
 
       const isBullStrategy = createOrderDto.type === OrderTypeEnum.Buy;
 
-      const strategyType = isBullStrategy
-        ? StrategyTypeEnum.Bull
-        : StrategyTypeEnum.Bear;
-
-      // const data = JSON.stringify({});
-
-      const strategy = await this.strategiesService.create({
-        type: strategyType,
-        status: StrategyStatusEnum.Active,
-        symbol: createOrderDto.symbol,
-        userId: createOrderDto.userId,
-        data: null,
-      });
+      let strategy = null;
+      if (isBullStrategy) {
+        const strategyType = isBullStrategy
+          ? StrategyTypeEnum.Bull
+          : StrategyTypeEnum.Bear;
+        // const data = JSON.stringify({});
+        strategy = await this.strategiesService.create({
+          type: strategyType,
+          status: StrategyStatusEnum.Active,
+          symbol: createOrderDto.symbol,
+          userId: createOrderDto.userId,
+          data: null,
+        });
+      }
 
       const newOrder: Prisma.OrderCreateInput = {
         type: createOrderDto.type,
@@ -144,7 +145,9 @@ export class OrdersService {
       };
 
       const createdOrder = await this.db.order.create({ data: newOrder });
-      return { ...createdOrder, target: strategy.target };
+      return isBullStrategy
+        ? { ...createdOrder, target: strategy.target }
+        : createdOrder;
     } catch (err) {
       throw new BadReq(err.message);
     }

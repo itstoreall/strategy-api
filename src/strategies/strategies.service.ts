@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
 import { StrategyTypeEnum } from '../enum';
 import { DatabaseService } from '../database/database.service';
+import { UpdateStrategyDto } from './dto/update-strategy.dto';
 // import { UpdateStrategyDto } from './dto/update-strategy.dto';
 // import { UpdateStrategyDto } from './dto/update-strategy.dto';
 
@@ -132,22 +133,13 @@ export class StrategiesService {
       userId,
       data,
     };
-
-    // console.log('newStrategy:', newStrategy);
-
     return await this.db.strategy.create({ data: newStrategy });
   }
 
-  async updateStrategyById(id: number, amount: string) {
-    console.log('id, amount:', id, amount);
-
-    // const date = Date.now();
-
+  async updateStrategyById(body: UpdateStrategyDto) {
     return await this.db.strategy.update({
-      where: { id },
-      data: {
-        data: [{ amount }],
-      } as Prisma.StrategyUpdateInput,
+      where: { id: body.strategyId },
+      data: { data: body.data } as Prisma.StrategyUpdateInput,
       // data: strategyData as Prisma.StrategyUpdateInput,
     });
   }
