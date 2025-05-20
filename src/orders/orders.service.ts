@@ -164,6 +164,7 @@ export class OrdersService {
     try {
       const deletedOrder = await this.db.order.delete({ where: { id } });
 
+      /*
       const remainingOrders = await this.db.order.findMany({
         where: {
           symbol: deletedOrder.symbol,
@@ -171,7 +172,7 @@ export class OrdersService {
           userId: deletedOrder.userId,
         },
       });
-
+      
       if (remainingOrders.length === 0) {
         const strategyType =
           deletedOrder.type === OrderTypeEnum.Buy
@@ -189,6 +190,7 @@ export class OrdersService {
           console.log(`Deleted strategy with ID: ${strategy.id}`);
         }
       }
+      */
 
       return deletedOrder;
     } catch (err) {
