@@ -4,7 +4,7 @@ import { Exchange, OrderStatus, OrderType, Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { StrategiesService } from '../strategies/strategies.service';
-import { SessionsService } from '../sessions/sessions.service';
+// import { SessionsService } from '../sessions/sessions.service';
 import { DatabaseService } from '../database/database.service';
 import {
   OrderStatusEnum,
@@ -19,7 +19,7 @@ export class OrdersService {
   constructor(
     private readonly db: DatabaseService,
     private readonly strategiesService: StrategiesService,
-    private readonly sessionsService: SessionsService,
+    // private readonly sessionsService: SessionsService,
   ) {}
 
   /*
@@ -34,7 +34,7 @@ export class OrdersService {
     return await this.db.order.findUnique({ where: { id } });
   }
 
-  async findAllByUserId(userId: string, sessionToken: string) {
+  async findAllByUserId(userId: string) {
     /*
     console.log('userId:::', userId);
     console.log('sessionToken:::', sessionToken);
@@ -58,10 +58,6 @@ export class OrdersService {
       if (!isEqual) throw new BadReq('ERROR: failed Admin sessionTokens!');
     }
     */
-
-    if (!sessionToken) {
-      throw new BadReq('No sessionToken!');
-    }
 
     try {
       const userOrders = await this.db.order.findMany({
