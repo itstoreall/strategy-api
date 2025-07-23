@@ -12,6 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ResponseInterceptor } from '../interceptors/response.interceptor';
+import { DeleteManyOrdersDto } from './dto/delete-many-orders.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersService } from './orders.service';
@@ -89,5 +90,11 @@ export class OrdersController {
   @Delete('id/:id')
   removeById(@Param('id', ParseIntPipe) id: string) {
     return this.ordersService.removeById(+id);
+  }
+
+  @Delete('many')
+  deleteManyOrders(@Body() deleteDto: DeleteManyOrdersDto) {
+    // console.log(1, deleteDto);
+    return this.ordersService.deleteManyByIds(deleteDto.orderIds);
   }
 }

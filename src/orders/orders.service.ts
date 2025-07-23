@@ -193,4 +193,21 @@ export class OrdersService {
       throw new BadReq(err.message);
     }
   }
+
+  async deleteManyByIds(orderIds: number[]) {
+    // console.log(2, orderIds);
+    try {
+      if (!orderIds.length) throw new BadReq('Order IDs are required');
+      const deleted = await this.db.order.deleteMany({
+        where: { id: { in: orderIds } },
+      });
+      // console.log(3, deleted);
+      return {
+        deletedCount: deleted.count,
+        deletedIds: orderIds,
+      };
+    } catch (err) {
+      throw new BadReq(err.message);
+    }
+  }
 }
