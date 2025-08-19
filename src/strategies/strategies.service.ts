@@ -7,6 +7,18 @@ import { UpdateStrategyDto } from './dto/update-strategy.dto';
 // import { UpdateStrategyDto } from './dto/update-strategy.dto';
 // import { UpdateStrategyDto } from './dto/update-strategy.dto';
 
+type StrategyValuesSelect = {
+  data: boolean;
+  symbol: boolean;
+};
+
+type HodlTargetsEntry = {
+  symbol: string;
+  hodlTargets: { v25: string; v50: string; v75: string; v100: string };
+};
+
+type StrategyDataElement = { symbol: string; data: Prisma.JsonValue };
+
 @Injectable()
 export class StrategiesService {
   constructor(private readonly db: DatabaseService) {}
@@ -68,6 +80,43 @@ export class StrategiesService {
     }, []);
 
     return res;
+  }
+
+  // --- Reusable method (do not change!)
+  async findByUserId(userId: string, select?: StrategyValuesSelect) {
+    return await this.db.strategy.findMany({
+      where: {
+        userId,
+        AND: [{ data: { not: null } }, { data: { not: 'null' } }],
+      },
+      orderBy: { updatedAt: 'desc' },
+      select,
+    });
+  }
+
+  async findAllHodlTargets(userId: string) {
+    const select = { data: true, symbol: true };
+    const res = await this.findByUserId(userId, select);
+    const hodlTargets = res.reduce(
+      (acc: HodlTargetsEntry[], el: StrategyDataElement) => {
+        const parsedData = JSON.parse(el.data as string);
+        if (parsedData.hodlTargets) {
+          const hodlTargetsEntry = {
+            symbol: el.symbol,
+            hodlTargets: parsedData.hodlTargets[0],
+          };
+          acc = [...acc, hodlTargetsEntry];
+        }
+        return acc;
+      },
+      [],
+    );
+    return hodlTargets;
+  }
+
+  async findAllStrategyData(userId: string) {
+    const select = { data: true, symbol: true };
+    return this.findByUserId(userId, select);
   }
 
   async findById(id: number) {

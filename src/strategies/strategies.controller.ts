@@ -34,6 +34,16 @@ export class StrategiesController {
     return this.strategiesService.findAll(strategyType, extend);
   }
 
+  @Get('user/:userId')
+  findAllStartegyData(@Param('userId') userId: string) {
+    return this.strategiesService.findAllStrategyData(userId);
+  }
+
+  @Get('hodl-targets/user/:userId')
+  findAllHodlTargets(@Param('userId') userId: string) {
+    return this.strategiesService.findAllHodlTargets(userId);
+  }
+
   @Get('id/:id')
   findById(@Param('id', ParseIntPipe) id: string) {
     return this.strategiesService.findById(+id);
