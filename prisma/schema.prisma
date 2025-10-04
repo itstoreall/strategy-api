@@ -33,6 +33,7 @@ enum Exchange {
   BINANCE
   BYBIT
   MEXC
+  BITUNIX
   BITGET
   BINGX
   OKX
