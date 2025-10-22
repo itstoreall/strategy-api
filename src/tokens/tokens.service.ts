@@ -48,7 +48,13 @@ export class TokensService {
     const createdPair = `${tokenSymbol}USDT`;
     const pairRegex = /^[A-Z]+USDT$/;
 
-    if (!pairRegex.test(createdPair) && tokenSymbol !== '1INCH')
+    if (
+      !pairRegex.test(createdPair) &&
+      tokenSymbol !== '1INCH' &&
+      tokenSymbol !== '0G' &&
+      tokenSymbol !== 'API3' &&
+      tokenSymbol !== '2Z'
+    )
       throw new BadReq('Invalid pair format!');
 
     const checkParam = { where: { symbol: tokenSymbol } };
