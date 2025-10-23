@@ -53,7 +53,8 @@ export class TokensService {
       tokenSymbol !== '1INCH' &&
       tokenSymbol !== '0G' &&
       tokenSymbol !== 'API3' &&
-      tokenSymbol !== '2Z'
+      tokenSymbol !== '2Z' &&
+      tokenSymbol !== 'C98'
     )
       throw new BadReq('Invalid pair format!');
 
